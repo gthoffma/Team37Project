@@ -9,6 +9,7 @@ public class CSE360TeamProject extends Application{
         launch(args);
     }
 	public void start(Stage primaryStage) {
+		System.out.println("Hello from John");
 		Button OKButton = new Button("OK");
 		Scene scene = new Scene(OKButton, 200, 300);
 		primaryStage.setTitle("CSETeamProject360 Testing");
