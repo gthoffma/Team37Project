@@ -16,4 +16,5 @@ public class CSE360TeamProject extends Application{
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
+
 }
