@@ -34,7 +34,7 @@
     -fx-font-family: "Courier New", Courier, monospace;
 }
 
-#filePath, #high, #low {
+#filePath, #high, #low, #mean, #median, #mode, #numEntries {
     -fx-font-family: "Courier New", Courier, monospace;
 }
 
