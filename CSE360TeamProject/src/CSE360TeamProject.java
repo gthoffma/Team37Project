@@ -43,27 +43,36 @@ public class CSE360TeamProject extends Application{
 		display.setText("Error: Input is outside current range: LOW: 0 HIGH: 100");
 		GridPane.setValignment(display, VPos.BOTTOM);
 
+		// num of entries, high, low, mean, median, mode
+		// median of even numbered list = average of middle two.
+
+		Label numEntriesLabel = new Label("Entries:");
+		Label meanLabel = new Label("Mean:");
+		Label medianLabel = new Label("Median:");
+		Label modeLabel = new Label("Mode:");
 		Label highLabel = new Label("High:");
 		Label lowLabel = new Label("Low:");
+		Text numEntries = new Text("500");
+		Text mean = new Text("75.5");
+		Text median = new Text("74");
+		Text mode = new Text("75");
 		Text high = new Text("100");
 		Text low = new Text("0");
+		numEntries.setId("numEntries");
 		high.setId("high");
 		low.setId("low");
+		mean.setId("mean");
+		median.setId("median");
+		mode.setId("mode");
 		GridPane.setValignment(low, VPos.TOP);
 
 		//Creating a Grid Pane
 		GridPane gridPane = new GridPane();
-
-		//Setting size for the pane
 		gridPane.setMinSize(900, 700);
-
-		//Setting the padding
 		gridPane.setPadding(new Insets(10, 10, 10, 10));
 
-		gridPane.setGridLinesVisible(false);
-
 		//Setting the vertical and horizontal gaps between the columns
-		gridPane.setVgap(10);
+		gridPane.setVgap(8);
 		gridPane.setHgap(10);
 
 		//Setting the Grid alignment
@@ -95,21 +104,30 @@ public class CSE360TeamProject extends Application{
 		bc.setLegendVisible(false);
 		GridPane.setValignment(bc, VPos.TOP);
 
-		//Left Sidebar
-		gridPane.add(text1, 0, 4);
-		gridPane.add(filePath, 0, 5);
-		gridPane.add(button1, 0, 6);
-		gridPane.add(button2, 0, 7);
-		gridPane.add(button3, 0, 8);
-		gridPane.add(button4, 0, 9);
-		gridPane.add(highLabel, 0, 10);
-		gridPane.add(high, 0, 11);
-		gridPane.add(lowLabel, 0, 12);
-		gridPane.add(low, 0, 13);
 
-		gridPane.add(title, 1, 1, 1,1);
-		gridPane.add(display, 1, 21, 1, 1);
-		gridPane.add(bc, 1, 2,1,20);
+		//Left Sidebar
+		gridPane.add(text1, 0, 4,2,1);
+		gridPane.add(filePath, 0, 5,2,1);
+		gridPane.add(button1, 0, 6,2,1);
+		gridPane.add(button2, 0, 7,2,1);
+		gridPane.add(button3, 0, 8,2,1);
+		gridPane.add(button4, 0, 9,2,1);
+		gridPane.add(numEntriesLabel, 0, 13,1,1);
+		gridPane.add(numEntries, 1, 13,1,1);
+		gridPane.add(highLabel, 0, 14,1,1);
+		gridPane.add(high, 1, 14,1,1);
+		gridPane.add(lowLabel, 0, 15,1,1);
+		gridPane.add(low, 1, 15,1,1);
+		gridPane.add(meanLabel, 0, 16,1,1);
+		gridPane.add(mean, 1, 16,1,1);
+		gridPane.add(medianLabel, 0, 17,1,1);
+		gridPane.add(median, 1, 17,1,1);
+		gridPane.add(modeLabel, 0, 18,1,1);
+		gridPane.add(mode, 1, 18,1,1);
+
+		gridPane.add(title, 3, 1, 1,1);
+		gridPane.add(display, 3, 21, 1, 4);
+		gridPane.add(bc, 3, 2,1,20);
 
 		// Creating a scene object
 		Scene scene = new Scene(gridPane);
@@ -124,6 +142,8 @@ public class CSE360TeamProject extends Application{
 
 		//Displaying the contents of the stage
 		stage.show();
+
+		gridPane.setGridLinesVisible(false);
 
 		scene.getStylesheets().add("./stylesheet.css");
 	}
