@@ -240,7 +240,7 @@
     <BarChart fx:id="barChart"
               legendVisible="false"
               GridPane.columnIndex="3"
-              GridPane.rowIndex="2"
+              GridPane.rowIndex="0"
               GridPane.columnSpan="1"
               GridPane.rowSpan="20">
         <xAxis>
