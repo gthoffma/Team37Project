@@ -42,7 +42,7 @@
     -fx-max-height: 100px;
 }
 
-#bar-chart{
+#barChart{
     -fx-max-height: 400px;
     -fx-padding: 15px 0 15px 0;
 }
