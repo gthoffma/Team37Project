@@ -4,11 +4,12 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
 public class Controller {
     public Text text1;
-    public Text filePath;
+    public TextField filePath;
     public Button button1;
     public Button button2;
     public Button button3;

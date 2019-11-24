@@ -26,7 +26,7 @@
           GridPane.rowSpan="1"
           GridPane.halignment="CENTER"
     />
-    <Text fx:id="filePath"
+    <TextField fx:id="filePath"
           text="/directory/file.csv "
           GridPane.columnIndex="0"
           GridPane.rowIndex="5"
