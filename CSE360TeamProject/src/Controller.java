@@ -14,8 +14,16 @@ public class Controller {
     public Button button2;
     public Button button3;
     public Button button4;
+    public Button button5;
+    public Button button6;
+    public Label boundaryLow;
+    public Label boundaryHigh;
+    public TextField inputBoundLow;
+    public TextField inputBoundHigh;
+    public TextField manualInput;
     public Label title;
     public TextArea display;
+    public Label manualInputLabel;
     public Label numEntriesLabel;
     public Label meanLabel;
     public Label medianLabel;
