@@ -40,10 +40,6 @@
 
 #display {
     -fx-max-height: 100px;
-    /* uncomment below for error messages */
-     -fx-text-fill: red;
-    /* uncomment below for success messages */
-     /*-fx-text-fill: green;*/
 }
 
 #barChart{

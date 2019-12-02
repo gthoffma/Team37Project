@@ -29,7 +29,7 @@
             onAction="#onLoadDataClicked"
     />
     <Label fx:id="boundaryLow"
-           text="lowest value:"
+           text="low bound:"
            GridPane.columnIndex="0"
            GridPane.rowIndex="5"
            GridPane.columnSpan="1"
@@ -37,7 +37,7 @@
            GridPane.halignment="LEFT"
     />
     <TextField fx:id="inputBoundLow"
-               text=""
+               text="0"
                GridPane.columnIndex="1"
                GridPane.rowIndex="5"
                GridPane.columnSpan="1"
@@ -45,7 +45,7 @@
                GridPane.halignment="LEFT"
     />
     <Label fx:id="boundaryHigh"
-           text="highest value:"
+           text="high bound:"
            GridPane.columnIndex="0"
            GridPane.rowIndex="6"
            GridPane.columnSpan="1"
@@ -53,7 +53,7 @@
            GridPane.halignment="LEFT"
     />
     <TextField fx:id="inputBoundHigh"
-               text=""
+               text="100"
                GridPane.columnIndex="1"
                GridPane.rowIndex="6"
                GridPane.columnSpan="1"
@@ -67,6 +67,7 @@
             GridPane.columnSpan="2"
             GridPane.rowSpan="1"
             GridPane.halignment="LEFT"
+            onAction="#onSetBoundsClicked"
     />
     <Label fx:id="manualInputLabel"
            text="Manual Input Value: "
@@ -175,7 +176,6 @@
            GridPane.rowSpan="1"
     />
     <Text fx:id="numEntries"
-          text="50"
           GridPane.columnIndex="1"
           GridPane.rowIndex="13"
           GridPane.columnSpan="1"
