@@ -55,13 +55,24 @@ public class Controller {
     public float highValue;
     public float lowValue;
     public XYChart.Series<Number, String> series1 = new XYChart.Series<>();
+    public String reportFile = "report.txt";
 
     @FXML
     public void initialize() {
         updateNumberOfEntries(grades);
         display.setText("Welcome to Grade Analytics!\nLoad a file or enter grades manually to begin. ");
     }
+    
+    /* TODO the report can be written to a file for each method called
+     *  for instance, when the clear data method is called, we can write to the 
+     *  file named report.txt
+     */
 
+    //TODO the grades may not be from 0 to 100,
+    // we should divide the graph into equal parts from the high value
+    // to the low value
+    // i.e., if the user set the boundaries from -10 to 120, we could have 10 divisions of 
+    // size 13
     private void populateHistogram(ArrayList<Float> grades) {
         CategoryAxis yAxis = (CategoryAxis) barChart.getYAxis();
         NumberAxis xAxis = (NumberAxis) barChart.getXAxis();
@@ -119,6 +130,7 @@ public class Controller {
 
     }
 
+    //TODO error handling for file not found, etc.
     public void onLoadDataClicked() {
 
         FileChooser fileChooser = new FileChooser();
@@ -164,6 +176,7 @@ public class Controller {
                 String[] gradeLineStringArray = line.split(cvsSplitBy);
                 if (checkLineCSV(gradeLineStringArray, numberOfLines)) {
                     for (String s : gradeLineStringArray) {
+                    	//TODO parseFloat error handling
                         Float gradeFloat = Float.parseFloat(s);
                         grades.add(gradeFloat);
                     }
