@@ -4,10 +4,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -17,6 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Controller {
     public Button button1;
@@ -60,7 +58,7 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        numEntries.setText(String.valueOf(numberOfEntries));
+        updateNumberOfEntries(grades);
         display.setText("Welcome to Grade Analytics!\nLoad a file or enter grades manually to begin. ");
     }
 
@@ -80,26 +78,26 @@ public class Controller {
         int seventyOneToEighty = 0;
         int eightyOneToNinety = 0;
         int ninetyOneToOneHundred = 0;
-        for (Float g : grades){
-            if ( g >= 0 && g < 10.5 ){
+        for (Float g : grades) {
+            if (g >= 0 && g < 10.5) {
                 zeroToTen++;
-            } else if (g >= 10.5 && g < 20.5){
+            } else if (g >= 10.5 && g < 20.5) {
                 elevenToTwenty++;
-            } else if (g >= 20.5 && g < 30.5){
+            } else if (g >= 20.5 && g < 30.5) {
                 twentyOneToThirty++;
-            } else if (g >= 30.5 && g < 40.5){
+            } else if (g >= 30.5 && g < 40.5) {
                 thirtyOneToForty++;
-            } else if (g >= 40.5 && g < 50.5){
+            } else if (g >= 40.5 && g < 50.5) {
                 fortyOneToFifty++;
-            } else if (g >= 50.5 && g < 60.5){
+            } else if (g >= 50.5 && g < 60.5) {
                 fiftyOneToSixty++;
-            } else if (g >= 60.5 && g < 70.5){
+            } else if (g >= 60.5 && g < 70.5) {
                 sixtyOneToSeventy++;
-            } else if (g >= 70.5 && g < 80.5){
+            } else if (g >= 70.5 && g < 80.5) {
                 seventyOneToEighty++;
-            } else if (g >= 80.5 && g < 90.5){
+            } else if (g >= 80.5 && g < 90.5) {
                 eightyOneToNinety++;
-            } else if (g >= 90.5 && g <= 100){
+            } else if (g >= 90.5 && g <= 100) {
                 ninetyOneToOneHundred++;
             }
 
@@ -122,6 +120,7 @@ public class Controller {
     }
 
     public void onLoadDataClicked() {
+
         FileChooser fileChooser = new FileChooser();
         Stage stage = (Stage) GridPane.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
@@ -132,9 +131,17 @@ public class Controller {
             if (i > 0) {
                 extension = fileName.substring(i + 1);
                 if (extension.equals("csv")) {
-                    readCSVFile(file);
+                    grades.clear();
+                    if (readCSVFile(file)) {
+                        display.setText("Data Was Loaded Successfully");
+                        display.setStyle("-fx-text-fill: green ;");
+                    }
                 } else if (extension.equals("txt")) {
-                    readTXTFile(file);
+                    grades.clear();
+                    if (readTXTFile(file)) {
+                        display.setText("Data Was Loaded Successfully");
+                        display.setStyle("-fx-text-fill: green ;");
+                    }
                 } else {
                     display.setText("File extension: " + extension + " not recognized");
                     display.setStyle("-fx-text-fill: red ;");
@@ -143,8 +150,8 @@ public class Controller {
         }
     }
 
-    private void readCSVFile(File file) {
-        //System.out.println(file);
+    private boolean readCSVFile(File file) {
+        boolean returnValue = true;
         String line;
         String cvsSplitBy = ",";
         int numberOfLines = 0;
@@ -155,44 +162,70 @@ public class Controller {
                 // remove zero-width space
                 line = line.replace("\uFEFF", "");
                 String[] gradeLineStringArray = line.split(cvsSplitBy);
-                if (checkLine(gradeLineStringArray, numberOfLines)) {
+                if (checkLineCSV(gradeLineStringArray, numberOfLines)) {
                     for (String s : gradeLineStringArray) {
                         Float gradeFloat = Float.parseFloat(s);
                         grades.add(gradeFloat);
                     }
-
+                    updateNumberOfEntries(grades);
                     populateHistogram(grades);
+                } else {
+                    returnValue = false;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+            returnValue = false;
         }
+        return returnValue;
     }
 
-    private void readTXTFile(File file) {
+    private boolean readTXTFile(File file) {
+        boolean returnValue = true;
         String line;
+        int numberOfLines = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
             while ((line = br.readLine()) != null) {
-                Float gradeFloat = Float.parseFloat(line.trim());
-                grades.add(gradeFloat);
+                numberOfLines++;
+                if (checkLineTXT(line, numberOfLines)){
+                    Float gradeFloat = Float.parseFloat(line.trim());
+                    grades.add(gradeFloat);
+                } else {
+                    returnValue = false;
+                }
             }
 
         } catch (IOException e) {
             e.printStackTrace();
+            returnValue = false;
         }
-        printGrades(grades);
-
+        if (returnValue){
+            updateNumberOfEntries(grades);
+            populateHistogram(grades);
+        }
+        return returnValue;
     }
+
     // TODO Implement checkLine to ensure values in each line of the file are valid
-    private boolean checkLine(String[] line, int numberOfLines) {
+    private boolean checkLineCSV(String[] line, int numberOfLines) {
         return true;
+    }
+
+    // TODO Implement checkLine to ensure values in each line of the file are valid
+    private boolean checkLineTXT(String line, int numberOfLines) {
+        return true;
+    }
+
+    public void updateNumberOfEntries(ArrayList<Float> grades){
+        numberOfEntries = grades.size();
+        numEntries.setText(String.valueOf(numberOfEntries));
     }
 
     public void onSetBoundsClicked() {
         String highValueText = inputBoundHigh.getText();
         String lowValueText = inputBoundLow.getText();
-        if (setUpperBound(highValueText) && setLowerBound(lowValueText)){
+        if (setUpperBound(highValueText) && setLowerBound(lowValueText)) {
             display.setText("Lower Bound Set To: " + lowValueText + "\n" + "Upper Bound Set to: " + highValueText);
             display.setStyle("-fx-text-fill: green;");
         }
@@ -228,47 +261,63 @@ public class Controller {
     }
 
     // TODO Implement Manual Entry Clicked
-    public void onManualEntryClicked(){
+    public void onManualEntryClicked() {
 
     }
 
     // TODO Implement onAppendDataClicked
-    public void onAppendDataClicked(){
+    public void onAppendDataClicked() {
 
     }
 
     // TODO Implement onCreateReportClicked
-    public void onCreateReportClicked(ArrayList<Float> grades){
+    public void onCreateReportClicked(ArrayList<Float> grades) {
 
     }
 
     //TODO Implement calculate mean
-    public void calculateMean(ArrayList<Float> grades){
+    public void calculateMean(ArrayList<Float> grades) {
 
     }
 
     //TODO Implement calculate median
-    public void calculateMedian(ArrayList<Float> grades){
+    public void calculateMedian(ArrayList<Float> grades) {
 
     }
 
     // TODO Implement calculate Mode
-    public void calculateMode(ArrayList<Float> grades){
+    public void calculateMode(ArrayList<Float> grades) {
 
     }
 
     // TODO Implement calculate high value
-    public void calculateHighValue(ArrayList<Float> grades){
+    public void calculateHighValue(ArrayList<Float> grades) {
 
     }
 
     // TODO Implement calculate low value
-    public void calculateLowValue(ArrayList<Float> grades){
+    public void calculateLowValue(ArrayList<Float> grades) {
 
     }
 
-    public void onDeleteDataClicked(){
-        grades.clear();
+    public void onDeleteDataClicked() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText("Delete All Data");
+        alert.setContentText("Are you sure you want to delete all grade data?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()){
+            if (result.get() == ButtonType.OK){
+                // ... user chose OK
+                grades.clear();
+                populateHistogram(grades);
+                updateNumberOfEntries(grades);
+                display.setText("Grade Data Deleted");
+                display.setStyle("-fx-text-fill: black");
+            }
+        }
+
     }
 
     private void printGrades(ArrayList<Float> grades) {
