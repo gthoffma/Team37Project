@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.lang.Math; //for Math.ceil()
 
 public class Controller {
     public Button button1;
@@ -69,6 +70,7 @@ public class Controller {
      *  file named report.txt
      * I think a better way is to append to a String instance variable and to write the contents of it to the file only when the
      * Create Report button is clicked. - JC
+     * ^ do this
      */
 
     //TODO the grades may not be from 0 to 100,
@@ -77,6 +79,8 @@ public class Controller {
     // i.e., if the user set the boundaries from -10 to 120, we could have 10 divisions of 
     // size 13
     // I put together a fix for this, but it needs testing. -JC
+    // changed the highBound labels to use the ceiling of highbound, as the bounds
+    // could be floats -GH
 
     /**
      * Populates the grade histogram.
@@ -121,7 +125,7 @@ public class Controller {
                 eighthDivision++;
             } else if (g >= lowBound + (8 * divisionSize) && g < lowBound + (9 * divisionSize)) {
                 ninthDivision++;
-            } else if (g >= lowBound + (9 * divisionSize) && g <= highBound) {
+            } else if (g >= lowBound + (9 * divisionSize) && g <= Math.ceil(highBound)) {
                 tenthDivision++;
             }
 
@@ -135,7 +139,7 @@ public class Controller {
         series1.getData().add(new XYChart.Data<>(seventhDivision, (int) ((lowBound + (6 * divisionSize)) + 1) + "-" + (int) (lowBound + (7 * divisionSize))));
         series1.getData().add(new XYChart.Data<>(eighthDivision, (int) ((lowBound + (7 * divisionSize)) + 1) + "-" + (int) (lowBound + (8 * divisionSize))));
         series1.getData().add(new XYChart.Data<>(ninthDivision, (int) ((lowBound + (8 * divisionSize)) + 1) + "-" + (int) (lowBound + (9 * divisionSize))));
-        series1.getData().add(new XYChart.Data<>(tenthDivision, (int) ((lowBound + (9 * divisionSize)) + 1) + "-" + (int) (highBound)));
+        series1.getData().add(new XYChart.Data<>(tenthDivision, (int) ((lowBound + (9 * divisionSize)) + 1) + "-" + Math.ceil(highBound)));
         // yAxis Labels must be set manually because of a bug in JavaFx
         yAxis.setCategories(FXCollections.observableArrayList(
                 (int) lowBound + "-" + (int) (lowBound + (1 * divisionSize)),
@@ -147,7 +151,7 @@ public class Controller {
                 (int) ((lowBound + (6 * divisionSize)) + 1) + "-" + (int) (lowBound + (7 * divisionSize)),
                 (int) ((lowBound + (7 * divisionSize)) + 1) + "-" + (int) (lowBound + (8 * divisionSize)),
                 (int) ((lowBound + (8 * divisionSize)) + 1) + "-" + (int) (lowBound + (9 * divisionSize)),
-                (int) ((lowBound + (9 * divisionSize)) + 1) + "-" + (int) (highBound)));
+                (int) ((lowBound + (9 * divisionSize)) + 1) + "-" + Math.ceil(highBound)));
 
         barChart.getData().add(series1);
 
@@ -157,6 +161,7 @@ public class Controller {
 
     //TODO error handling for file not found, etc.
     // FYI - There won't be a file not found error with the file chooser implementation -JC
+    //NOTE: currently causes an IllegalArgumentException, don't know the cause
     public void onLoadDataClicked() {
 
         FileChooser fileChooser = new FileChooser();
@@ -175,12 +180,18 @@ public class Controller {
                         display.setStyle("-fx-text-fill: green ;");
                         logString += "Grade Data Loaded From: " + file + "\n";
                     }
+                    else {
+                    	
+                    }
                 } else if (extension.equals("txt")) {
                     grades.clear();
                     if (readTXTFile(file)) {
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
                         logString += "Grade Data Loaded From: " + file + "\n";
+                    }
+                    else {
+                    	
                     }
                 } else {
                     display.setText("File extension: " + extension + " not recognized");
@@ -202,18 +213,30 @@ public class Controller {
         String line;
         String cvsSplitBy = ",";
         int numberOfLines = 0;
+        int currentLineNum = 0;
+        int currentLine = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
             while ((line = br.readLine()) != null) {
+            	currentLine++;
+            	currentLineNum = 0;
                 numberOfLines++;
                 // remove zero-width space
                 line = line.replace("\uFEFF", "");
                 String[] gradeLineStringArray = line.split(cvsSplitBy);
                 if (checkLineCSV(gradeLineStringArray, numberOfLines)) {
                     for (String s : gradeLineStringArray) {
+                    	currentLineNum++;
                         //TODO parseFloat error handling
-                        Float gradeFloat = Float.parseFloat(s);
-                        grades.add(gradeFloat);
+                    	try {
+                    		Float gradeFloat = Float.parseFloat(s);
+                    		grades.add(gradeFloat);
+                    	}
+                    	catch(NumberFormatException e){
+                    		display.setText(display.getText() + "\n\tERROR: line: " + currentLine + " number: " + 
+                    				currentLine + " is " + s +", which is not a float");
+                    		returnValue = false;
+                    	}
                     }
                     updateNumberOfEntries(grades);
                     populateHistogram(grades, highBound, lowBound);
@@ -263,7 +286,13 @@ public class Controller {
 
     // TODO Implement checkLine to ensure values in each line of the file are valid
     // TODO ie that each entry in the array can be parsed to a float - if not, we have the line number to output the required message.
+    //couldn't error handling be done in the readCSVFile method?
     private boolean checkLineCSV(String[] line, int numberOfLines) {
+    	for(int i = 0; i < line.length; i++) {
+    		try {Float.parseFloat(line[i]);}
+    		catch(NumberFormatException e){
+    		}
+    	}
         return true;
     }
 
