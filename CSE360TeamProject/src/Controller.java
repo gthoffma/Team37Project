@@ -148,7 +148,9 @@ public class Controller {
                 (int) ((lowBound + (7 * divisionSize)) + 1) + "-" + (int) (lowBound + (8 * divisionSize)),
                 (int) ((lowBound + (8 * divisionSize)) + 1) + "-" + (int) (lowBound + (9 * divisionSize)),
                 (int) ((lowBound + (9 * divisionSize)) + 1) + "-" + (int) (highBound)));
-        barChart.getData().add(series1); 
+
+        barChart.getData().add(series1);
+
 
 
     }
@@ -188,10 +190,11 @@ public class Controller {
         }
     }
 
-    /** 
+
+    /**
      * Reads the grade data from the .csv file.
      *
-     * @param file - The .csv file to read.c
+     * @param file - The .csv file to read
      * @return - true if the file was read successfully.
      */
     private boolean readCSVFile(File file) {
