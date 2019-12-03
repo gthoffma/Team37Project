@@ -68,51 +68,70 @@ public class Controller {
      *  file named report.txt
      */
 
-    //TODO the grades may not be from 0 to 100,
-    // we should divide the graph into equal parts from the high value
-    // to the low value
-    // i.e., if the user set the boundaries from -10 to 120, we could have 10 divisions of 
-    // size 13
+
     private void populateHistogram(ArrayList<Float> grades) {
+    	//barChart.getData().removeAll();
         CategoryAxis yAxis = (CategoryAxis) barChart.getYAxis();
         NumberAxis xAxis = (NumberAxis) barChart.getXAxis();
         xAxis.setLabel("Frequency");
         yAxis.setLabel("Grade Distribution");
+        
+        //gradeDistribution holds an int array representing the 
+        // number of inputs in that range
+        int[] gradeDistribution = new int[10];
 
-        int zeroToTen = 0;
-        int elevenToTwenty = 0;
-        int twentyOneToThirty = 0;
-        int thirtyOneToForty = 0;
-        int fortyOneToFifty = 0;
-        int fiftyOneToSixty = 0;
-        int sixtyOneToSeventy = 0;
-        int seventyOneToEighty = 0;
-        int eightyOneToNinety = 0;
-        int ninetyOneToOneHundred = 0;
+        //initialize the number of grades in each division to 0
+        for(int i = 0; i < gradeDistribution.length; i++) {
+        	gradeDistribution[i] = 0;
+        }
+
+        // string array for distribution labels
+        String[] distLabelArr = new String[10];
         for (Float g : grades) {
-            if (g >= 0 && g < 10.5) {
-                zeroToTen++;
-            } else if (g >= 10.5 && g < 20.5) {
-                elevenToTwenty++;
-            } else if (g >= 20.5 && g < 30.5) {
-                twentyOneToThirty++;
-            } else if (g >= 30.5 && g < 40.5) {
-                thirtyOneToForty++;
-            } else if (g >= 40.5 && g < 50.5) {
-                fortyOneToFifty++;
-            } else if (g >= 50.5 && g < 60.5) {
-                fiftyOneToSixty++;
-            } else if (g >= 60.5 && g < 70.5) {
-                sixtyOneToSeventy++;
-            } else if (g >= 70.5 && g < 80.5) {
-                seventyOneToEighty++;
-            } else if (g >= 80.5 && g < 90.5) {
-                eightyOneToNinety++;
-            } else if (g >= 90.5 && g <= 100) {
-                ninetyOneToOneHundred++;
+        	//for each division of 10, if the element g in grades is between the 
+        	// values in the division, increase the gradeDistribution at that index
+        	// NOTE: integer division is done to prevent the graph from having long
+        	// decimal places
+            if (g >= lowBound && g < (highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[0]++;
+            } else if (g >= (highBound-lowBound)/10 + lowBound &&  g < 2*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[1]++;
+            } else if (g >= 2*(highBound-lowBound)/10 + lowBound &&  g < 3*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[2]++;
+            } else if (g >= 3*(highBound-lowBound)/10 + lowBound &&  g < 4*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[3]++;
+            } else if (g >= 4*(highBound-lowBound)/10 + lowBound &&  g < 5*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[4]++;;
+            } else if (g >= 5*(highBound-lowBound)/10 + lowBound &&  g < 6*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[5]++;
+            } else if (g >= 6*(highBound-lowBound)/10 + lowBound &&  g < 7*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[6]++;
+            } else if (g >= 7*(highBound-lowBound)/10 + lowBound &&  g < 8*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[7]++;
+            } else if (g >= 8*(highBound-lowBound)/10 + lowBound &&  g < 9*(highBound-lowBound)/10 + lowBound) {
+                gradeDistribution[8]++;
+            } else if (g >= 9*(highBound-lowBound)/10 + lowBound &&  g < highBound) {
+                gradeDistribution[9]++;
             }
 
+            //set the upper and lower distribution labels separately, then
+            // iterate through the other labels
+            distLabelArr[0] = lowBound.toString()+"-"+Float.toString((highBound-lowBound)/10 + lowBound);
+            distLabelArr[9] = Float.toString(9*(highBound-lowBound)/10 + lowBound)+"-"+highBound.toString();
+            for(int i = 1; i < 9; i++) {
+            	distLabelArr[i] = Float.toString(i*(highBound-lowBound)/10 + lowBound)+"-"+Float.toString((i+1)*(highBound-lowBound)/10 + lowBound);
+            }
         }
+        //fill the graph with the labels and data
+        for(int i = 0; i < 10; i++) {
+        	series1.getData().add(new XYChart.Data<>(gradeDistribution[i], distLabelArr[i]));
+        }
+        
+        yAxis.setCategories(FXCollections.observableArrayList(distLabelArr[0],distLabelArr[1],distLabelArr[2],distLabelArr[3],
+        		distLabelArr[4],distLabelArr[5],distLabelArr[6],distLabelArr[7],distLabelArr[8],distLabelArr[9]));
+        
+        //old way of adding data
+        /*
         series1.getData().add(new XYChart.Data<>(zeroToTen, "0-10"));
         series1.getData().add(new XYChart.Data<>(elevenToTwenty, "11-20"));
         series1.getData().add(new XYChart.Data<>(twentyOneToThirty, "21-30"));
@@ -125,6 +144,7 @@ public class Controller {
         series1.getData().add(new XYChart.Data<>(ninetyOneToOneHundred, "91-100"));
         yAxis.setCategories(FXCollections.observableArrayList("0-10", "11-20", "21-30", "31-40", "41-50", "51-60",
                 "61-70", "71-80", "81-90", "91-100"));
+                */
         barChart.getData().add(series1);
 
 
