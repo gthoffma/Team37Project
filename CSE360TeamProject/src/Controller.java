@@ -122,7 +122,7 @@ public class Controller {
             	distLabelArr[i] = Float.toString(i*(highBound-lowBound)/10 + lowBound)+"-"+Float.toString((i+1)*(highBound-lowBound)/10 + lowBound);
             }
         }
-        //fill the graph with the labels and data
+        //fill the graph with the labels and data 
         for(int i = 0; i < 10; i++) {
         	series1.getData().add(new XYChart.Data<>(gradeDistribution[i], distLabelArr[i]));
         }
