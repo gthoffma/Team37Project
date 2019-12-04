@@ -92,6 +92,7 @@
             GridPane.columnSpan="2"
             GridPane.rowSpan="1"
             GridPane.halignment="LEFT"
+            onAction="#onManualEntryClicked"
     />
     <Button fx:id="button3"
             text="Append Data"

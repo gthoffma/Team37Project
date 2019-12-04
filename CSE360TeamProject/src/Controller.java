@@ -78,6 +78,8 @@ public class Controller {
         NumberAxis xAxis = (NumberAxis) barChart.getXAxis();
         xAxis.setLabel("Frequency");
         yAxis.setLabel("Grade Distribution");
+        //remove previous data
+        barChart.getData().clear();
         // needed to add this - yAxis Labels weren't showing.
         series1 = new XYChart.Series<>();
         float divisionSize = (highBound - lowBound) / 10.0f;
@@ -354,7 +356,29 @@ public class Controller {
 
     // TODO Implement Manual Entry Clicked
     public void onManualEntryClicked() {
-
+    	if(boundsSet == false) {
+    		display.setText("ERROR: Please set lower and upper bounds for values before entering a value");
+    		display.setStyle("-fx-text-fill: red ;");
+    		return;
+    	}
+    	float tempGrade = 0;
+    	try {
+    		tempGrade = Float.parseFloat(manualInput.getText());
+    		if(tempGrade < lowBound || tempGrade > highBound) {
+    			display.setText("ERROR: " + tempGrade + " is not within set bounds");
+    			display.setStyle("-fx-text-fill: red ;");
+    		}
+    		else {
+    			display.setText("");
+    			grades.add(tempGrade);
+    			updateNumberOfEntries(grades);
+    			populateHistogram(grades, highBound, lowBound);
+    		}
+    	}
+    	catch(NumberFormatException e) {
+    		display.setText("ERROR: " + manualInput.getText() + " is not recognized as a float");
+    		display.setStyle("-fx-text-fill: red ;");
+    	}
     }
 
     /**
@@ -391,8 +415,8 @@ public class Controller {
             else {
             	display.setText("ERROR: Please load a .csv or .txt file");
                 display.setStyle("-fx-text-fill: red ;");
+            }
         }
-
     }
 
     // TODO Implement onCreateReportClicked
