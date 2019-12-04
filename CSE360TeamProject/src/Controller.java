@@ -56,23 +56,15 @@ public class Controller {
     public float highValue;
     public float lowValue;
     public XYChart.Series<Number, String> series1 = new XYChart.Series<>();
-    public String reportFile = "report.txt"; // TODO: if this is just a file name, it should be a constant -JC
-    public String logString;
+    public final String reportFile = "report.txt";
+    public String logString; //holds the log of all the user activity; write this string to the report
+    public boolean boundsSet = false;
 
     @FXML
     public void initialize() {
         updateNumberOfEntries(grades);
         display.setText("Welcome to Grade Analytics!\nLoad a file or enter grades manually to begin. ");
     }
-
-    //TODO the grades may not be from 0 to 100,
-    // we should divide the graph into equal parts from the high value
-    // to the low value
-    // i.e., if the user set the boundaries from -10 to 120, we could have 10 divisions of
-    // size 13
-    // I put together a fix for this, but it needs testing. -JC
-    // changed the highBound labels to use the ceiling of highbound, as the bounds
-    // could be floats -GH
 
     /**
      * Populates the grade histogram.
@@ -155,6 +147,12 @@ public class Controller {
      * Prompts the user to enter a .csv or .txt file of grades. Loading data clears the existing data set.
      */
     public void onLoadDataClicked() {
+    	//first check if the user has set bounds before loading a file
+    	if(boundsSet == false) {
+    		display.setText("ERROR: Please set lower and upper bounds for values before loading a file");
+    		display.setStyle("-fx-text-fill: red ;");
+    		return;
+    	}
         FileChooser fileChooser = new FileChooser();
         Stage stage = (Stage) GridPane.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
@@ -180,6 +178,11 @@ public class Controller {
                     display.setText("File extension: " + extension + " not recognized");
                     display.setStyle("-fx-text-fill: red ;");
                 }
+            }
+            //if i is less than 0, the file does not have an extension, give user an error message
+            else {
+            	display.setText("ERROR: Please load a .csv or .txt file");
+                display.setStyle("-fx-text-fill: red ;");
             }
         }
     }
@@ -208,9 +211,17 @@ public class Controller {
                 for (String s : gradeLineStringArray) {
                     try {
                         Float gradeFloat = Float.parseFloat(s);
-                        tempGrades.add(gradeFloat);
+                        if(gradeFloat < lowBound || gradeFloat > highBound) {
+                        	//if data is out of bounds, don't add it
+                        }
+                        else {
+                        	tempGrades.add(gradeFloat);
+                        }
                     } catch (NumberFormatException e) {
-                        display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
+                    	if(returnValue) {
+                    		display.setText("The following error(s) have occured when reading input:");
+                    	}
+                        display.setText(display.getText()+"\n\tERROR: row: " + row + " column: " +
                                 column + " is " + s + ", which is not a float or int");
                         display.setStyle("-fx-text-fill: red;");
                         returnValue = false;
@@ -223,6 +234,7 @@ public class Controller {
             display.setStyle("-fx-text-fill: red;");
             returnValue = false;
         }
+        //
         if (returnValue){
             if (!append){
                 grades.clear();
@@ -288,6 +300,7 @@ public class Controller {
      * Sets the upper and lower bounds when the user clicks the "Set Bounds" button.
      */
     public void onSetBoundsClicked() {
+    	boundsSet = true;
         String highValueText = inputBoundHigh.getText();
         String lowValueText = inputBoundLow.getText();
         if (setUpperBound(highValueText) && setLowerBound(lowValueText)) {
@@ -374,6 +387,10 @@ public class Controller {
                     display.setStyle("-fx-text-fill: red ;");
                 }
             }
+            //if i is less than 0, the file does not have an extension, give user an error message
+            else {
+            	display.setText("ERROR: Please load a .csv or .txt file");
+                display.setStyle("-fx-text-fill: red ;");
         }
 
     }
