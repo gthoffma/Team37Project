@@ -100,6 +100,7 @@
             GridPane.columnSpan="2"
             GridPane.rowSpan="1"
             GridPane.halignment="LEFT"
+            onAction="#onAppendDataClicked"
     />
     <Button fx:id="button5"
             text="Create Report"
@@ -225,13 +226,10 @@
               GridPane.columnSpan="1"
               GridPane.rowSpan="20">
         <xAxis>
-            <NumberAxis id="xAxis"
-                        tickLabelRotation="90"
-                        label="Frequency"/>
+            <NumberAxis id="xAxis"/>
         </xAxis>
         <yAxis>
-            <CategoryAxis id="yAxis"
-                          label="Grade Distribution"/>
+            <CategoryAxis id="yAxis"/>
         </yAxis>
     </BarChart>
 </GridPane>
