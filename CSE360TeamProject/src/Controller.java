@@ -65,18 +65,10 @@ public class Controller {
         display.setText("Welcome to Grade Analytics!\nLoad a file or enter grades manually to begin. ");
     }
 
-    /* TODO the report can be written to a file for each method called
-     *  for instance, when the clear data method is called, we can write to the
-     *  file named report.txt
-     * I think a better way is to append to a String instance variable and to write the contents of it to the file only when the
-     * Create Report button is clicked. - JC
-     * ^ do this
-     */
-
     //TODO the grades may not be from 0 to 100,
     // we should divide the graph into equal parts from the high value
     // to the low value
-    // i.e., if the user set the boundaries from -10 to 120, we could have 10 divisions of 
+    // i.e., if the user set the boundaries from -10 to 120, we could have 10 divisions of
     // size 13
     // I put together a fix for this, but it needs testing. -JC
     // changed the highBound labels to use the ceiling of highbound, as the bounds
@@ -94,6 +86,8 @@ public class Controller {
         NumberAxis xAxis = (NumberAxis) barChart.getXAxis();
         xAxis.setLabel("Frequency");
         yAxis.setLabel("Grade Distribution");
+        // needed to add this - yAxis Labels weren't showing.
+        series1 = new XYChart.Series<>();
         float divisionSize = (highBound - lowBound) / 10.0f;
 
         int firstDivision = 0;
@@ -125,7 +119,7 @@ public class Controller {
                 eighthDivision++;
             } else if (g >= lowBound + (8 * divisionSize) && g < lowBound + (9 * divisionSize)) {
                 ninthDivision++;
-            } else if (g >= lowBound + (9 * divisionSize) && g <= Math.ceil(highBound)) {
+            } else if (g >= lowBound + (9 * divisionSize) && g <= highBound) {
                 tenthDivision++;
             }
 
@@ -155,15 +149,12 @@ public class Controller {
 
         barChart.getData().add(series1);
 
-
-
     }
 
-    //TODO error handling for file not found, etc.
-    // FYI - There won't be a file not found error with the file chooser implementation -JC
-    //NOTE: currently causes an IllegalArgumentException, don't know the cause
+    /**
+     * Prompts the user to enter a .csv or .txt file of grades. Loading data clears the existing data set.
+     */
     public void onLoadDataClicked() {
-
         FileChooser fileChooser = new FileChooser();
         Stage stage = (Stage) GridPane.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
@@ -174,24 +165,16 @@ public class Controller {
             if (i > 0) {
                 extension = fileName.substring(i + 1);
                 if (extension.equals("csv")) {
-                    grades.clear();
-                    if (readCSVFile(file)) {
+                    if (readCSVFile(file, false)) {
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
                         logString += "Grade Data Loaded From: " + file + "\n";
-                    }
-                    else {
-                    	
                     }
                 } else if (extension.equals("txt")) {
-                    grades.clear();
-                    if (readTXTFile(file)) {
+                    if (readTXTFile(file, false)) {
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
                         logString += "Grade Data Loaded From: " + file + "\n";
-                    }
-                    else {
-                    	
                     }
                 } else {
                     display.setText("File extension: " + extension + " not recognized");
@@ -204,49 +187,49 @@ public class Controller {
 
     /**
      * Reads the grade data from the .csv file.
-     *
-     * @param file - The .csv file to read
-     * @return - true if the file was read successfully.
+     * @param file - The .csv file to read.
+     * @param append - whether to append to the data.
+     * @return - true if read successfully.
      */
-    private boolean readCSVFile(File file) {
+    private boolean readCSVFile(File file, boolean append) {
+        ArrayList<Float> tempGrades = new ArrayList<>();
         boolean returnValue = true;
         String line;
+        int row = 0;
+        int column;
         String cvsSplitBy = ",";
-        int numberOfLines = 0;
-        int currentLineNum = 0;
-        int currentLine = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-
             while ((line = br.readLine()) != null) {
-            	currentLine++;
-            	currentLineNum = 0;
-                numberOfLines++;
+                row++;
+                column = 0;
                 // remove zero-width space
                 line = line.replace("\uFEFF", "");
                 String[] gradeLineStringArray = line.split(cvsSplitBy);
-                if (checkLineCSV(gradeLineStringArray, numberOfLines)) {
-                    for (String s : gradeLineStringArray) {
-                    	currentLineNum++;
-                        //TODO parseFloat error handling
-                    	try {
-                    		Float gradeFloat = Float.parseFloat(s);
-                    		grades.add(gradeFloat);
-                    	}
-                    	catch(NumberFormatException e){
-                    		display.setText(display.getText() + "\n\tERROR: line: " + currentLine + " number: " + 
-                    				currentLine + " is " + s +", which is not a float");
-                    		returnValue = false;
-                    	}
+                for (String s : gradeLineStringArray) {
+                    try {
+                        Float gradeFloat = Float.parseFloat(s);
+                        tempGrades.add(gradeFloat);
+                    } catch (NumberFormatException e) {
+                        display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
+                                column + " is " + s + ", which is not a float or int");
+                        display.setStyle("-fx-text-fill: red;");
+                        returnValue = false;
                     }
-                    updateNumberOfEntries(grades);
-                    populateHistogram(grades, highBound, lowBound);
-                } else {
-                    returnValue = false;
+                    column++;
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            display.setText(display.getText() + "\n" + e.getMessage());
+            display.setStyle("-fx-text-fill: red;");
             returnValue = false;
+        }
+        if (returnValue){
+            if (!append){
+                grades.clear();
+            }
+            grades.addAll(tempGrades);
+            updateNumberOfEntries(grades);
+            populateHistogram(grades, highBound, lowBound);
         }
         return returnValue;
     }
@@ -257,49 +240,38 @@ public class Controller {
      * @param file - The .txt file to read
      * @return - true if the file was read successfully.
      */
-    private boolean readTXTFile(File file) {
+    private boolean readTXTFile(File file, boolean append) {
+        ArrayList<Float> tempGrades = new ArrayList<>();
         boolean returnValue = true;
         String line;
-        int numberOfLines = 0;
+        int row = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-
             while ((line = br.readLine()) != null) {
-                numberOfLines++;
-                if (checkLineTXT(line, numberOfLines)) {
+                row++;
+                try {
                     Float gradeFloat = Float.parseFloat(line.trim());
-                    grades.add(gradeFloat);
-                } else {
+                    tempGrades.add(gradeFloat);
+                } catch (NumberFormatException e){
+                    display.setText(display.getText() + "\n\tERROR: row: " + row + " is " + line.trim() + ", which is not a float or int");
+                    display.setStyle("-fx-text-fill: red;");
                     returnValue = false;
                 }
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            display.setText(display.getText() + "\n" + e.getMessage());
+            display.setStyle("-fx-text-fill: red;");
             returnValue = false;
         }
         if (returnValue) {
+            if (!append){
+                grades.clear();
+            }
+            grades.addAll(tempGrades);
             updateNumberOfEntries(grades);
             populateHistogram(grades, highBound, lowBound);
         }
         return returnValue;
-    }
-
-    // TODO Implement checkLine to ensure values in each line of the file are valid
-    // TODO ie that each entry in the array can be parsed to a float - if not, we have the line number to output the required message.
-    //couldn't error handling be done in the readCSVFile method?
-    private boolean checkLineCSV(String[] line, int numberOfLines) {
-    	for(int i = 0; i < line.length; i++) {
-    		try {Float.parseFloat(line[i]);}
-    		catch(NumberFormatException e){
-    		}
-    	}
-        return true;
-    }
-
-    // TODO Implement checkLine to ensure values in each line of the file are valid
-    // TODO ie that there is 1 entry per line and it can be parsed to a float - if not, we have the line number to output the required message.
-    private boolean checkLineTXT(String line, int numberOfLines) {
-        return true;
     }
 
     /**
@@ -372,8 +344,37 @@ public class Controller {
 
     }
 
-    // TODO Implement onAppendDataClicked
+    /**
+     * Prompts the user to enter a .csv or .txt file of grades. Appending data does not clear the existing data set.
+     */
     public void onAppendDataClicked() {
+        FileChooser fileChooser = new FileChooser();
+        Stage stage = (Stage) GridPane.getScene().getWindow();
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            String extension;
+            String fileName = file.getName();
+            int i = fileName.lastIndexOf('.');
+            if (i > 0) {
+                extension = fileName.substring(i + 1);
+                if (extension.equals("csv")) {
+                    if (readCSVFile(file, true)) {
+                        display.setText("Data Was Appended Successfully");
+                        display.setStyle("-fx-text-fill: green ;");
+                        logString += "Grade Data Loaded From: " + file + "\n";
+                    }
+                } else if (extension.equals("txt")) {
+                    if (readTXTFile(file, true)) {
+                        display.setText("Data Was Appended Successfully");
+                        display.setStyle("-fx-text-fill: green ;");
+                        logString += "Grade Data Loaded From: " + file + "\n";
+                    }
+                } else {
+                    display.setText("File extension: " + extension + " not recognized");
+                    display.setStyle("-fx-text-fill: red ;");
+                }
+            }
+        }
 
     }
 
