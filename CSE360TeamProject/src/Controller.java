@@ -1,5 +1,3 @@
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
@@ -11,11 +9,9 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 public class Controller {
@@ -52,14 +48,15 @@ public class Controller {
     public int numberOfEntries = 0;
     public float meanValue;
     public float medianValue;
+    public boolean modeValid = false;
     public float modeValue;
     public float highValue;
     public float lowValue;
     public XYChart.Series<Number, String> series1 = new XYChart.Series<>();
     public final String reportFile = "report.txt";
-    public String logString; //holds the log of all the user activity; write this string to the report
+    public String logString = ""; //holds the log of all the user activity; write this string to the report
     public boolean boundsSet = false;
-    public String errorLogString;
+    public String errorLogString = "ERRORS:\n\n";
     public Button DeleteSingleButton;
     public TextField inputDeleteSingleTextField;
     public TextField inputSingleValueTextField;
@@ -71,14 +68,11 @@ public class Controller {
     public void initialize() {
         updateNumberOfEntries(grades);
         display.setText("Welcome to Grade Analytics!\nPlease set the grade bounds by clicking the Set Bounds button.\nThen, click: Load File");
-        graphToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if(getSelectedRadioButton()){
-                    populateDistributionHistogram(grades, highBound, lowBound);
-                } else {
-                    populateAverageHistogram(grades, highBound, lowBound);
-                }
+        graphToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (getSelectedRadioButton()) {
+                populateDistributionHistogram(grades, highBound, lowBound);
+            } else {
+                populateAverageHistogram(grades, highBound, lowBound);
             }
         });
     }
@@ -286,11 +280,13 @@ public class Controller {
      * Prompts the user to enter a .csv or .txt file of grades. Loading data clears the existing data set.
      */
     public void onLoadDataClicked() {
+        StringBuilder sb = new StringBuilder();
         //first check if the user has set bounds before loading a file
         if (!boundsSet) {
             display.setText("ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += "ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)\n";
+            sb.append("ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)\n\n");
+            errorLogString += sb.toString();
             return;
         }
         FileChooser fileChooser = new FileChooser();
@@ -304,29 +300,29 @@ public class Controller {
                 extension = fileName.substring(i + 1);
                 if (extension.equals("csv")) {
                     if (readCSVFile(file, false)) {
-                        errorLogString = "";
+                        errorLogString = "ERRORS:\n";
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
-                        logString += "Grade Data Loaded From: " + file + "\n";
+                        logString += "Grade Data Loaded From: " + file + "\n\n";
                     }
                 } else if (extension.equals("txt")) {
                     if (readTXTFile(file, false)) {
-                        errorLogString = "";
+                        errorLogString = "ERRORS:\n";
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
-                        logString += "Grade Data Loaded From: " + file + "\n";
+                        logString += "Grade Data Loaded From: " + file + "\n\n";
                     }
                 } else {
                     display.setText("ERROR: File extension: " + extension + " not recognized");
                     display.setStyle("-fx-text-fill: red ;");
-                    errorLogString += "ERROR: File extension: " + extension + " not recognized\n";
+                    errorLogString += "ERROR: File extension: " + extension + " not recognized\n\n";
                 }
             }
             //if i is less than 0, the file does not have an extension, give user an error message
             else {
                 display.setText("ERROR: Please load a .csv or .txt file");
                 display.setStyle("-fx-text-fill: red ;");
-                errorLogString += "ERROR: Please load a .csv or .txt file\n";
+                errorLogString += "ERROR: Please load a .csv or .txt file\n\n";
             }
         }
     }
@@ -340,6 +336,7 @@ public class Controller {
      * @return - true if read successfully.
      */
     private boolean readCSVFile(File file, boolean append) {
+        StringBuilder sb = new StringBuilder();
         ArrayList<Float> tempGrades = new ArrayList<>();
         boolean returnValue = true;
         String line;
@@ -358,6 +355,10 @@ public class Controller {
                         float gradeFloat = Float.parseFloat(s);
                         if (gradeFloat < lowBound || gradeFloat > highBound) {
                             //if data is out of bounds, don't add it
+                            display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
+                                    column + " is " + s + ", which is out of bounds.");
+                            display.setStyle("-fx-text-fill: red;");
+                            sb.append("ERROR: row: ").append(row).append(" column: ").append(column).append(" is ").append(s).append(", which is out of bounds\n");
                         } else {
                             tempGrades.add(gradeFloat);
                         }
@@ -368,7 +369,7 @@ public class Controller {
                         display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
                                 column + " is " + s + ", which is not a float or int");
                         display.setStyle("-fx-text-fill: red;");
-                        errorLogString += "ERROR: row: " + row + " column: " + column + " is " + s + ", which is not a float or int\n";
+                        sb.append("ERROR: row: ").append(row).append(" column: ").append(column).append(" is ").append(s).append(", which is not a float or int\n");
                         returnValue = false;
                     }
                     column++;
@@ -377,22 +378,25 @@ public class Controller {
         } catch (IOException e) {
             display.setText("ERROR: Unable to read the file provided. " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
-            errorLogString += "ERROR: Unable to read the file provided. " + e.getMessage() + "\n";
+            sb.append("ERROR: Unable to read the file provided. ").append(e.getMessage()).append("\n");
             returnValue = false;
         }
-
+        errorLogString += sb.toString() + "\n";
         if (!append) {
             grades.clear();
         }
         grades.addAll(tempGrades);
         updateNumberOfEntries(grades);
+        calculateMean(grades);
+        calculateMedian(grades);
+        calculateMode(grades);
+        calculateHighValue(grades);
+        calculateLowValue(grades);
         if (getSelectedRadioButton()) {
             populateDistributionHistogram(grades, highBound, lowBound);
         } else {
             populateAverageHistogram(grades, highBound, lowBound);
         }
-
-
         return returnValue;
     }
 
@@ -403,6 +407,7 @@ public class Controller {
      * @return - true if the file was read successfully.
      */
     private boolean readTXTFile(File file, boolean append) {
+        StringBuilder sb = new StringBuilder();
         ArrayList<Float> tempGrades = new ArrayList<>();
         boolean returnValue = true;
         String line;
@@ -416,22 +421,27 @@ public class Controller {
                 } catch (NumberFormatException e) {
                     display.setText(display.getText() + "\n\tERROR: row: " + row + " is " + line.trim() + ", which is not a float or int");
                     display.setStyle("-fx-text-fill: red;");
-                    errorLogString += "ERROR: row: " + row + " is " + line.trim() + ", which is not a float or int\n";
+                    sb.append("ERROR: row: ").append(row).append(" is ").append(line.trim()).append(", which is not a float or int\n");
                     returnValue = false;
                 }
             }
-
         } catch (IOException e) {
             display.setText("ERROR: Unable to read the file provided. " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
-            errorLogString += "ERROR: Unable to read the file provided. " + e.getMessage() + "\n";
+            sb.append("ERROR: Unable to read the file provided. ").append(e.getMessage()).append("\n");
             returnValue = false;
         }
+        errorLogString += sb.toString() + "\n";
         if (!append) {
             grades.clear();
         }
         grades.addAll(tempGrades);
         updateNumberOfEntries(grades);
+        calculateMean(grades);
+        calculateMedian(grades);
+        calculateMode(grades);
+        calculateHighValue(grades);
+        calculateLowValue(grades);
         if (getSelectedRadioButton()) {
             populateDistributionHistogram(grades, highBound, lowBound);
         } else {
@@ -461,8 +471,8 @@ public class Controller {
         if (setUpperBound(highValueText) && setLowerBound(lowValueText)) {
             display.setText("Lower Bound Set To: " + lowValueText + "\n" + "Upper Bound Set to: " + highValueText);
             display.setStyle("-fx-text-fill: green;");
-            logString += "Lower Bound Set To: " + lowValueText + "\n";
-            logString += "Upper Bound Set To: " + highValueText + "\n";
+            logString += "Lower Bound Set To: " + lowValueText + "\n\n";
+            logString += "Upper Bound Set To: " + highValueText + "\n\n";
         }
     }
 
@@ -481,7 +491,7 @@ public class Controller {
         } catch (NumberFormatException e) {
             display.setText("ERROR: " + highValueText + " is not a valid number (int or float).");
             display.setStyle("-fx-text-fill: red;");
-            errorLogString += "ERROR: " + highValueText + " is not a valid number (int or float).\n";
+            errorLogString += "ERROR: " + highValueText + " is not a valid number (int or float).\n\n";
             returnValue = false;
         }
         return returnValue;
@@ -502,7 +512,7 @@ public class Controller {
         } catch (NumberFormatException e) {
             display.setText("ERROR: " + lowValueText + " is not a valid number (int or float).");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += "ERROR: " + lowValueText + " is not a valid number (int or float).\n";
+            errorLogString += "ERROR: " + lowValueText + " is not a valid number (int or float).\n\n";
             returnValue = false;
         }
         return returnValue;
@@ -516,7 +526,7 @@ public class Controller {
         if (!boundsSet) {
             display.setText("ERROR: Please set lower and upper bounds for values before entering a value \n (click the Set Bounds button)");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += "ERROR: Please set lower and upper bounds for values before entering a value (click the Set Bounds button)\n";
+            errorLogString += "ERROR: Please set lower and upper bounds for values before entering a value (click the Set Bounds button)\n\n";
             return;
         }
         float tempGrade;
@@ -525,17 +535,23 @@ public class Controller {
             if (tempGrade < lowBound || tempGrade > highBound) {
                 display.setText("ERROR: " + tempGrade + " is not within set bounds");
                 display.setStyle("-fx-text-fill: red ;");
-                errorLogString += "ERROR: " + tempGrade + " is not within set bounds\n";
+                errorLogString += "ERROR: " + tempGrade + " is not within set bounds\n\n";
             } else {
-                display.setText("Grade: " + tempGrade + " successfully added.");
+                display.setText("Single Value: " + tempGrade + " was successfully added to the grades list.");
                 grades.add(tempGrade);
                 updateNumberOfEntries(grades);
+                calculateMean(grades);
+                calculateMedian(grades);
+                calculateMode(grades);
+                calculateHighValue(grades);
+                calculateLowValue(grades);
                 populateDistributionHistogram(grades, highBound, lowBound);
+                logString += "Single Value: " + tempGrade + " successfully added to the grades list.\n\n";
             }
         } catch (NumberFormatException e) {
             display.setText("ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += "ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)\n";
+            errorLogString += "ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)\n\n";
         }
         inputSingleValueTextField.clear();
     }
@@ -548,7 +564,7 @@ public class Controller {
         if (!boundsSet) {
             display.setText("ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += "ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)\n";
+            errorLogString += "ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)\n\n";
             return;
         }
         FileChooser fileChooser = new FileChooser();
@@ -564,13 +580,13 @@ public class Controller {
                     if (readCSVFile(file, true)) {
                         display.setText("Data Was Appended Successfully");
                         display.setStyle("-fx-text-fill: green ;");
-                        logString += "Grade Data Loaded From: " + file + "\n";
+                        logString += "Grade Data Appended with data from: " + file + "\n\n";
                     }
                 } else if (extension.equals("txt")) {
                     if (readTXTFile(file, true)) {
                         display.setText("Data Was Appended Successfully");
                         display.setStyle("-fx-text-fill: green ;");
-                        logString += "Grade Data Loaded From: " + file + "\n";
+                        logString += "Grade Data Appended with data from: " + file + "\n\n";
                     }
                 } else {
                     display.setText("ERROR: File extension: " + extension + " not recognized");
@@ -587,11 +603,12 @@ public class Controller {
         }
     }
 
-    // TODO Implement onCreateReportsClicked
-    // 3 Reports Needed:
-    // 1. Display Data in the GUI in 4 columns in descending order
-    // 2. Error Log
-    // 3. External report.txt file
+    /**
+     * Creates the 3 Reports Needed:
+     *   1. Display Data in the GUI in 4 columns in descending order
+     *   2. Error Log
+     *   3. External report.txt file
+     */
     public void onCreateReportsClicked() {
         ArrayList<String> choices = new ArrayList<>();
         String errorLog = "Error Log";
@@ -613,45 +630,153 @@ public class Controller {
             switch (s) {
                 case "Data Report":
                     // Create Data Report
-                    System.out.println(s);
+                    createDataReport(grades);
                     break;
                 case "Error Log":
                     // Create Error Log
-                    System.out.println(s);
+                    display.clear();
+                    display.setText(errorLogString);
+                    display.setStyle("-fx-text-fill: red;");
                     break;
                 case "Activity Report (file creation)":
                     // Create Activity Report
-                    System.out.println(s);
+                    createActivityReport();
                     break;
             }
         });
-
-
     }
 
-    //TODO Implement calculate mean
+    public void createActivityReport() {
+        try {
+            // Create file
+            FileWriter fstream = new FileWriter(reportFile);
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(logString);
+            //Close the output stream
+            out.close();
+            display.setText("Activity Report: " + reportFile + " Successfully Created.");
+            display.setStyle("-fx-text-fill: green;");
+            logString += "Activity Report: " + reportFile + " Successfully Created.\n\n";
+        } catch (Exception e) {
+            display.setText("ERROR: There was an error creating the Activity Report: " + e.getMessage());
+            display.setStyle("-fx-text-fill: red;");
+            errorLogString += "ERROR: There was an error creating the Activity Report: " + e.getMessage() + "\n\n";
+        }
+    }
+
+    public void createDataReport(ArrayList<Float> grades) {
+        display.clear();
+        int rows = (int) Math.ceil(grades.size() / 4.0);
+        int columns = 4;
+        grades.sort(Collections.reverseOrder());
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (i + (rows * j) < grades.size()) {
+                    display.setText(display.getText() + grades.get(i + (rows * j)) + "     ");
+                }
+            }
+            display.setText(display.getText() + "\n");
+        }
+    }
+
+    /**
+     * Calculates mean value of grades ArrayList.
+     *
+     * @param grades - The grades ArrayList.
+     */
     public void calculateMean(ArrayList<Float> grades) {
+        float sum = 0.0f;
+        float meanVal;
 
+        for (Float g : grades) {
+            sum += g;
+        }
+        meanVal = sum / grades.size();
+        meanValue = meanVal;
+        mean.setText(String.valueOf(meanValue));
     }
 
-    //TODO Implement calculate median
+    /**
+     * Calculates median value of grades ArrayList.
+     *
+     * @param grades - The grades ArrayList.
+     */
     public void calculateMedian(ArrayList<Float> grades) {
+        float medianVal;
+        Collections.sort(grades);
+        int middle = grades.size() / 2;
+        if (grades.size() % 2 == 1) {
+            medianVal = grades.get(middle);
+        } else {
+            medianVal = ((grades.get(middle - 1) + grades.get(middle)) / 2.0f);
+        }
+        medianValue = medianVal;
+        median.setText(String.valueOf(medianValue));
 
     }
 
-    // TODO Implement calculate Mode
+    /**
+     * Calculates mode value of grades ArrayList.
+     *
+     * @param grades - The grades ArrayList.
+     */
     public void calculateMode(ArrayList<Float> grades) {
+        float modeVal = 0;
+        int maxCount = 0;
+        for (int i = 0; i < grades.size(); i++) {
+            int count = 0;
+            for (Float grade : grades) {
+                if (grade.equals(grades.get(i))) {
+                    count++;
+                }
+            }
+            if (count > maxCount) {
+                maxCount = count;
+                modeVal = grades.get(i);
+
+            }
+        }
+        if (maxCount > 1) {
+            modeValid = true;
+            modeValue = modeVal;
+            this.mode.setText(String.valueOf(modeValue));
+        } else {
+            this.mode.setText("No Mode");
+        }
 
     }
 
-    // TODO Implement calculate high value
+    /**
+     * Calculates high value of grades ArrayList.
+     *
+     * @param grades - The grades ArrayList.
+     */
     public void calculateHighValue(ArrayList<Float> grades) {
-
+        float highVal = grades.get(0);
+        for (Float g : grades) {
+            if (g > highVal) {
+                highVal = g;
+            }
+        }
+        highValue = highVal;
+        high.setText(String.valueOf(highValue));
     }
 
-    // TODO Implement calculate low value
+    /**
+     * Calculates low value of grades ArrayList.
+     *
+     * @param grades - The grades ArrayList.
+     */
     public void calculateLowValue(ArrayList<Float> grades) {
-
+        float lowVal = grades.get(0);
+        for (Float g : grades) {
+            if (g < lowVal) {
+                lowVal = g;
+            }
+        }
+        lowValue = lowVal;
+        low.setText(String.valueOf(lowValue));
     }
 
     /**
@@ -670,12 +795,26 @@ public class Controller {
                 grades.clear();
                 populateDistributionHistogram(grades, highBound, lowBound);
                 updateNumberOfEntries(grades);
+                meanValue = 0;
+                mean.setText("");
+                medianValue = 0;
+                median.setText("");
+                modeValue = 0;
+                mode.setText("");
+                highValue = 0;
+                high.setText("");
+                lowValue = 0;
+                low.setText("");
                 display.setText("Grade Data Deleted");
-                display.setStyle("-fx-text-fill: black");
+                display.setStyle("-fx-text-fill: green");
+                logString += "Grade Data Deleted\n\n";
             }
         }
     }
 
+    /**
+     * Called when user clicks the: Delete Single Value button.
+     */
     public void onDeleteSingleClicked() {
         float removeFloat;
         try {
@@ -689,24 +828,27 @@ public class Controller {
         inputDeleteSingleTextField.clear();
     }
 
+    /**
+     * Removes the value from the grades ArrayList, logs an error if the value is not in the grades ArrayList.
+     * @param value - The value to remove.
+     */
     public void removeValueFromArray(float value) {
         boolean inArray = grades.remove(value);
         if (inArray) {
-            display.setText("The value " + value + " was successfully removed from the grades list");
+            display.setText("Single Value: " + value + " was successfully removed from the grades list");
+            logString += "Single Value: " + value + " was successfully removed from the grades list.\n\n";
             display.setStyle("-fx-text-fill: green ;");
             updateNumberOfEntries(grades);
+            calculateMean(grades);
+            calculateMedian(grades);
+            calculateMode(grades);
+            calculateHighValue(grades);
+            calculateLowValue(grades);
             populateDistributionHistogram(grades, highBound, lowBound);
         } else {
             display.setText("The value " + value + " was not found in the grades list");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += "The value " + value + " was not found in the grades list\n";
-        }
-    }
-
-    // Helper method to print the grade array to the console - can be deleted before final submission.
-    private void printGrades(ArrayList<Float> grades) {
-        for (Float g : grades) {
-            System.out.println(g + " ");
+            errorLogString += "The value " + value + " was not found in the grades list\n\n";
         }
     }
 }
