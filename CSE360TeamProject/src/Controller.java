@@ -54,7 +54,7 @@ public class Controller {
     public float lowValue;
     public XYChart.Series<Number, String> series1 = new XYChart.Series<>();
     public final String reportFile = "report.txt";
-    public String logString = ""; //holds the log of all the user activity; write this string to the report
+    public String logString = "ACTIVITY:\n\n";
     public boolean boundsSet = false;
     public String errorLogString = "ERRORS:\n\n";
     public Button DeleteSingleButton;
@@ -488,6 +488,7 @@ public class Controller {
         try {
             highValueFloat = Float.parseFloat(highValueText);
             highBound = highValueFloat;
+            testUpperBoundOnExistingValues(highValueFloat);
         } catch (NumberFormatException e) {
             display.setText("ERROR: " + highValueText + " is not a valid number (int or float).");
             display.setStyle("-fx-text-fill: red;");
@@ -509,6 +510,7 @@ public class Controller {
         try {
             lowValueFloat = Float.parseFloat(lowValueText);
             lowBound = lowValueFloat;
+            testLowerBoundOnExistingValues(lowValueFloat);
         } catch (NumberFormatException e) {
             display.setText("ERROR: " + lowValueText + " is not a valid number (int or float).");
             display.setStyle("-fx-text-fill: red ;");
@@ -516,7 +518,40 @@ public class Controller {
             returnValue = false;
         }
         return returnValue;
+    }
 
+    /**
+     * Tests existing grades ArrayList for values greater than the newly-entered highBound. Removes them and logs error message.
+     * @param highValueFloat - The value of the newly entered highBound.
+     */
+    private void testUpperBoundOnExistingValues(float highValueFloat){
+        StringBuilder sb = new StringBuilder();
+        for(Float g : grades){
+            if (g > highValueFloat){
+                grades.remove(g);
+                display.setText(display.getText() + "\nGrade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n");
+                display.setStyle("-fx-text-fill: red;");
+                sb.append("Grade: ").append(g).append(" was removed. It is greater than upper bound: ").append(highValueFloat).append("\n");
+            }
+        }
+        errorLogString += sb.toString() + "\n";
+    }
+
+    /**
+     * Tests existing grades ArrayList for values less than the newly-entered lowBound. Removes them and logs error message.
+     * @param lowValueFloat - The value of the newly entered lowBound.
+     */
+    private void testLowerBoundOnExistingValues(float lowValueFloat){
+        StringBuilder sb = new StringBuilder();
+        for(Float g : grades){
+            if (g < lowValueFloat){
+                grades.remove(g);
+                display.setText(display.getText() + "\nGrade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n");
+                display.setStyle("-fx-text-fill: red;");
+                sb.append("Grade: ").append(g).append(" was removed. It is less than lower bound: ").append(lowValueFloat).append("\n");
+            }
+        }
+        errorLogString += sb.toString() + "\n";
     }
 
     /**
@@ -612,14 +647,14 @@ public class Controller {
     public void onCreateReportsClicked() {
         ArrayList<String> choices = new ArrayList<>();
         String errorLog = "Error Log";
-        String dataReport = "DataReport";
+        String dataReport = "Data Report";
         String activityReport = "Activity Report (file creation)";
 
         choices.add(errorLog);
         choices.add(dataReport);
         choices.add(activityReport);
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("Data Report", choices);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(errorLog, choices);
 
         dialog.setTitle("Report Dialog");
         dialog.setHeaderText("What Type Of Report Would You Like To Create?");
