@@ -1,3 +1,5 @@
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
@@ -67,10 +69,148 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        RadioButton selectedRadioButton = (RadioButton) graphToggleGroup.getSelectedToggle();
-
         updateNumberOfEntries(grades);
-        display.setText("Welcome to Grade Analytics!\nPlease set the grade bounds to begin.\nThen, click: Load File");
+        display.setText("Welcome to Grade Analytics!\nPlease set the grade bounds by clicking the Set Bounds button.\nThen, click: Load File");
+        graphToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                if(getSelectedRadioButton()){
+                    populateDistributionHistogram(grades, highBound, lowBound);
+                } else {
+                    populateAverageHistogram(grades, highBound, lowBound);
+                }
+            }
+        });
+    }
+
+    private boolean getSelectedRadioButton() {
+        boolean returnValue = true;
+        RadioButton selectedRadioButton = (RadioButton) graphToggleGroup.getSelectedToggle();
+        if (selectedRadioButton.idProperty().getValue().equals("radio2")) {
+            returnValue = false;
+        }
+        return returnValue;
+    }
+
+    private void populateAverageHistogram(ArrayList<Float> grades, float highBound, float lowBound) {
+        //remove previous data
+        barChart.getData().clear();
+        CategoryAxis yAxis = (CategoryAxis) barChart.getYAxis();
+        NumberAxis xAxis = (NumberAxis) barChart.getXAxis();
+        xAxis.setLabel("Average Score");
+        yAxis.setLabel("Grade Distribution");
+
+        // needed to add this - yAxis Labels weren't showing.
+        series1 = new XYChart.Series<>();
+        float range = (highBound - lowBound);
+
+        float firstDivision = 0.0f;
+        float firstDivisionSum = 0.0f;
+        float secondDivision = 0.0f;
+        float secondDivisionSum = 0.0f;
+        float thirdDivision = 0.0f;
+        float thirdDivisionSum = 0.0f;
+        float fourthDivision = 0.0f;
+        float fourthDivisionSum = 0.0f;
+        float fifthDivision = 0.0f;
+        float fifthDivisionSum = 0.0f;
+        float sixthDivision = 0.0f;
+        float sixthDivisionSum = 0.0f;
+        float seventhDivision = 0.0f;
+        float seventhDivisionSum = 0.0f;
+        float eighthDivision = 0.0f;
+        float eighthDivisionSum = 0.0f;
+        float ninthDivision = 0.0f;
+        float ninthDivisionSum = 0.0f;
+        float tenthDivision = 0.0f;
+        float tenthDivisionSum = 0.0f;
+        for (Float g : grades) {
+            float calculatedGrade = g / range;
+            if (calculatedGrade >= 0 && calculatedGrade < 0.095) {
+                firstDivision++;
+                firstDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.095 && calculatedGrade < 0.195) {
+                secondDivision++;
+                secondDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.195 && calculatedGrade < 0.295) {
+                thirdDivision++;
+                thirdDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.295 && calculatedGrade < 0.395) {
+                fourthDivision++;
+                fourthDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.395 && calculatedGrade < 0.495) {
+                fifthDivision++;
+                fifthDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.495 && calculatedGrade < 0.595) {
+                sixthDivision++;
+                sixthDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.595 && calculatedGrade < 0.695) {
+                seventhDivision++;
+                seventhDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.695 && calculatedGrade < 0.795) {
+                eighthDivision++;
+                eighthDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.795 && calculatedGrade < 0.895) {
+                ninthDivision++;
+                ninthDivisionSum += (calculatedGrade * 100);
+            } else if (calculatedGrade >= 0.895 && calculatedGrade <= 1) {
+                tenthDivision++;
+                tenthDivisionSum += (calculatedGrade * 100);
+            }
+        }
+        Number firstDivisionAverage = 0.0;
+        if (firstDivision != 0) {
+            firstDivisionAverage = (firstDivisionSum / firstDivision);
+        }
+        Number secondDivisionAverage = 0.0;
+        if (secondDivision != 0) {
+            secondDivisionAverage = (secondDivisionSum / secondDivision);
+        }
+        Number thirdDivisionAverage = 0.0;
+        if (thirdDivision != 0) {
+            thirdDivisionAverage = (thirdDivisionSum / thirdDivision);
+        }
+        Number fourthDivisionAverage = 0.0;
+        if (fourthDivision != 0) {
+            fourthDivisionAverage = (fourthDivisionSum / fourthDivision);
+        }
+        Number fifthDivisionAverage = 0.0;
+        if (fifthDivision != 0) {
+            fifthDivisionAverage = (fifthDivisionSum / fifthDivision);
+        }
+        Number sixthDivisionAverage = 0.0;
+        if (sixthDivision != 0) {
+            sixthDivisionAverage = (sixthDivisionSum / sixthDivision);
+        }
+        Number seventhDivisionAverage = 0.0;
+        if (seventhDivision != 0) {
+            seventhDivisionAverage = (seventhDivisionSum / seventhDivision);
+        }
+        Number eighthDivisionAverage = 0.0;
+        if (eighthDivision != 0) {
+            eighthDivisionAverage = (eighthDivisionSum / eighthDivision);
+        }
+        Number ninthDivisionAverage = 0.0;
+        if (ninthDivision != 0) {
+            ninthDivisionAverage = (ninthDivisionSum / ninthDivision);
+        }
+        Number tenthDivisionAverage = 0.0;
+        if (tenthDivision != 0) {
+            tenthDivisionAverage = (tenthDivisionSum / tenthDivision);
+        }
+        series1.getData().add(new XYChart.Data<>(firstDivisionAverage, "0-9%"));
+        series1.getData().add(new XYChart.Data<>(secondDivisionAverage, "10-19%"));
+        series1.getData().add(new XYChart.Data<>(thirdDivisionAverage, "20-29%"));
+        series1.getData().add(new XYChart.Data<>(fourthDivisionAverage, "30-39%"));
+        series1.getData().add(new XYChart.Data<>(fifthDivisionAverage, "40-49%"));
+        series1.getData().add(new XYChart.Data<>(sixthDivisionAverage, "50-59%"));
+        series1.getData().add(new XYChart.Data<>(seventhDivisionAverage, "60-69%"));
+        series1.getData().add(new XYChart.Data<>(eighthDivisionAverage, "70-79%"));
+        series1.getData().add(new XYChart.Data<>(ninthDivisionAverage, "80-89%"));
+        series1.getData().add(new XYChart.Data<>(tenthDivisionAverage, "90-100%"));
+        // yAxis Labels must be set manually because of a bug in JavaFx
+        yAxis.setCategories(FXCollections.observableArrayList("0-9%", "10-19%", "20-29%", "30-39%", "40-49%", "50-59%", "60-69%", "70-79%", "80-89%", "90-100%"));
+        barChart.getData().add(series1);
     }
 
     /**
@@ -80,7 +220,7 @@ public class Controller {
      * @param highBound - The current highBound
      * @param lowBound  - The current lowBound
      */
-    private void populateHistogram(ArrayList<Float> grades, float highBound, float lowBound) {
+    private void populateDistributionHistogram(ArrayList<Float> grades, float highBound, float lowBound) {
         CategoryAxis yAxis = (CategoryAxis) barChart.getYAxis();
         NumberAxis xAxis = (NumberAxis) barChart.getXAxis();
         xAxis.setLabel("Frequency");
@@ -148,8 +288,9 @@ public class Controller {
     public void onLoadDataClicked() {
         //first check if the user has set bounds before loading a file
         if (!boundsSet) {
-            display.setText("ERROR: Please set lower and upper bounds for values before loading a file");
+            display.setText("ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)");
             display.setStyle("-fx-text-fill: red ;");
+            errorLogString += "ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)\n";
             return;
         }
         FileChooser fileChooser = new FileChooser();
@@ -163,25 +304,29 @@ public class Controller {
                 extension = fileName.substring(i + 1);
                 if (extension.equals("csv")) {
                     if (readCSVFile(file, false)) {
+                        errorLogString = "";
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
                         logString += "Grade Data Loaded From: " + file + "\n";
                     }
                 } else if (extension.equals("txt")) {
                     if (readTXTFile(file, false)) {
+                        errorLogString = "";
                         display.setText("Data Was Loaded Successfully");
                         display.setStyle("-fx-text-fill: green ;");
                         logString += "Grade Data Loaded From: " + file + "\n";
                     }
                 } else {
-                    display.setText("File extension: " + extension + " not recognized");
+                    display.setText("ERROR: File extension: " + extension + " not recognized");
                     display.setStyle("-fx-text-fill: red ;");
+                    errorLogString += "ERROR: File extension: " + extension + " not recognized\n";
                 }
             }
             //if i is less than 0, the file does not have an extension, give user an error message
             else {
                 display.setText("ERROR: Please load a .csv or .txt file");
                 display.setStyle("-fx-text-fill: red ;");
+                errorLogString += "ERROR: Please load a .csv or .txt file\n";
             }
         }
     }
@@ -223,24 +368,30 @@ public class Controller {
                         display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
                                 column + " is " + s + ", which is not a float or int");
                         display.setStyle("-fx-text-fill: red;");
+                        errorLogString += "ERROR: row: " + row + " column: " + column + " is " + s + ", which is not a float or int\n";
                         returnValue = false;
                     }
                     column++;
                 }
             }
         } catch (IOException e) {
-            display.setText(display.getText() + "\n" + e.getMessage());
+            display.setText("ERROR: Unable to read the file provided. " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
+            errorLogString += "ERROR: Unable to read the file provided. " + e.getMessage() + "\n";
             returnValue = false;
         }
-
 
         if (!append) {
             grades.clear();
         }
         grades.addAll(tempGrades);
         updateNumberOfEntries(grades);
-        populateHistogram(grades, highBound, lowBound);
+        if (getSelectedRadioButton()) {
+            populateDistributionHistogram(grades, highBound, lowBound);
+        } else {
+            populateAverageHistogram(grades, highBound, lowBound);
+        }
+
 
         return returnValue;
     }
@@ -265,13 +416,15 @@ public class Controller {
                 } catch (NumberFormatException e) {
                     display.setText(display.getText() + "\n\tERROR: row: " + row + " is " + line.trim() + ", which is not a float or int");
                     display.setStyle("-fx-text-fill: red;");
+                    errorLogString += "ERROR: row: " + row + " is " + line.trim() + ", which is not a float or int\n";
                     returnValue = false;
                 }
             }
 
         } catch (IOException e) {
-            display.setText(display.getText() + "\n" + e.getMessage());
+            display.setText("ERROR: Unable to read the file provided. " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
+            errorLogString += "ERROR: Unable to read the file provided. " + e.getMessage() + "\n";
             returnValue = false;
         }
         if (!append) {
@@ -279,7 +432,11 @@ public class Controller {
         }
         grades.addAll(tempGrades);
         updateNumberOfEntries(grades);
-        populateHistogram(grades, highBound, lowBound);
+        if (getSelectedRadioButton()) {
+            populateDistributionHistogram(grades, highBound, lowBound);
+        } else {
+            populateAverageHistogram(grades, highBound, lowBound);
+        }
 
         return returnValue;
     }
@@ -322,8 +479,9 @@ public class Controller {
             highValueFloat = Float.parseFloat(highValueText);
             highBound = highValueFloat;
         } catch (NumberFormatException e) {
-            display.setText(e.getMessage());
+            display.setText("ERROR: " + highValueText + " is not a valid number (int or float).");
             display.setStyle("-fx-text-fill: red;");
+            errorLogString += "ERROR: " + highValueText + " is not a valid number (int or float).\n";
             returnValue = false;
         }
         return returnValue;
@@ -342,19 +500,23 @@ public class Controller {
             lowValueFloat = Float.parseFloat(lowValueText);
             lowBound = lowValueFloat;
         } catch (NumberFormatException e) {
-            display.setText(e.getMessage());
+            display.setText("ERROR: " + lowValueText + " is not a valid number (int or float).");
             display.setStyle("-fx-text-fill: red ;");
+            errorLogString += "ERROR: " + lowValueText + " is not a valid number (int or float).\n";
             returnValue = false;
         }
         return returnValue;
 
     }
 
-    // TODO Implement Manual Entry Clicked
+    /**
+     * Called when user clicks the Add Single Value button.
+     */
     public void onManualEntryClicked() {
         if (!boundsSet) {
-            display.setText("ERROR: Please set lower and upper bounds for values before entering a value");
+            display.setText("ERROR: Please set lower and upper bounds for values before entering a value \n (click the Set Bounds button)");
             display.setStyle("-fx-text-fill: red ;");
+            errorLogString += "ERROR: Please set lower and upper bounds for values before entering a value (click the Set Bounds button)\n";
             return;
         }
         float tempGrade;
@@ -363,15 +525,17 @@ public class Controller {
             if (tempGrade < lowBound || tempGrade > highBound) {
                 display.setText("ERROR: " + tempGrade + " is not within set bounds");
                 display.setStyle("-fx-text-fill: red ;");
+                errorLogString += "ERROR: " + tempGrade + " is not within set bounds\n";
             } else {
                 display.setText("Grade: " + tempGrade + " successfully added.");
                 grades.add(tempGrade);
                 updateNumberOfEntries(grades);
-                populateHistogram(grades, highBound, lowBound);
+                populateDistributionHistogram(grades, highBound, lowBound);
             }
         } catch (NumberFormatException e) {
             display.setText("ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)");
             display.setStyle("-fx-text-fill: red ;");
+            errorLogString += "ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)\n";
         }
         inputSingleValueTextField.clear();
     }
@@ -380,6 +544,13 @@ public class Controller {
      * Prompts the user to enter a .csv or .txt file of grades. Appending data does not clear the existing data set.
      */
     public void onAppendDataClicked() {
+        //first check if the user has set bounds before loading a file
+        if (!boundsSet) {
+            display.setText("ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)");
+            display.setStyle("-fx-text-fill: red ;");
+            errorLogString += "ERROR: Please set lower and upper bounds for values before loading a file \n (click the Set Bounds button)\n";
+            return;
+        }
         FileChooser fileChooser = new FileChooser();
         Stage stage = (Stage) GridPane.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
@@ -402,14 +573,16 @@ public class Controller {
                         logString += "Grade Data Loaded From: " + file + "\n";
                     }
                 } else {
-                    display.setText("File extension: " + extension + " not recognized");
+                    display.setText("ERROR: File extension: " + extension + " not recognized");
                     display.setStyle("-fx-text-fill: red ;");
+                    errorLogString += "ERROR: File extension: " + extension + " not recognized\n";
                 }
             }
             //if i is less than 0, the file does not have an extension, give user an error message
             else {
-                display.setText("ERROR: Please load a .csv or .txt file");
+                display.setText("ERROR: File type not recognized. Please load a .csv or .txt file");
                 display.setStyle("-fx-text-fill: red ;");
+                errorLogString += "ERROR: File type not recognized. Please load a .csv or .txt file\n";
             }
         }
     }
@@ -495,7 +668,7 @@ public class Controller {
             if (result.get() == ButtonType.OK) {
                 // ... user chose OK
                 grades.clear();
-                populateHistogram(grades, highBound, lowBound);
+                populateDistributionHistogram(grades, highBound, lowBound);
                 updateNumberOfEntries(grades);
                 display.setText("Grade Data Deleted");
                 display.setStyle("-fx-text-fill: black");
@@ -509,8 +682,9 @@ public class Controller {
             removeFloat = Float.parseFloat(inputSingleValueTextField.getText());
             removeValueFromArray(removeFloat);
         } catch (NumberFormatException e) {
-            display.setText(inputDeleteSingleTextField.getText() + " is not a valid number");
+            display.setText(inputDeleteSingleTextField.getText() + " is not a valid number (float or int)");
             display.setStyle("-fx-text-fill: red ;");
+            errorLogString += inputDeleteSingleTextField.getText() + " is not a valid number (float or int)\n";
         }
         inputDeleteSingleTextField.clear();
     }
@@ -521,10 +695,11 @@ public class Controller {
             display.setText("The value " + value + " was successfully removed from the grades list");
             display.setStyle("-fx-text-fill: green ;");
             updateNumberOfEntries(grades);
-            populateHistogram(grades, highBound, lowBound);
+            populateDistributionHistogram(grades, highBound, lowBound);
         } else {
             display.setText("The value " + value + " was not found in the grades list");
             display.setStyle("-fx-text-fill: red ;");
+            errorLogString += "The value " + value + " was not found in the grades list\n";
         }
     }
 
