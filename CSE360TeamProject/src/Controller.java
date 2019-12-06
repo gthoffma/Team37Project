@@ -60,7 +60,8 @@ public class Controller {
     public Button DeleteSingleButton;
     public TextField inputDeleteSingleTextField;
     public TextField inputSingleValueTextField;
-
+    public final String welcomeText = "Welcome to Grade Analytics!\nPlease set the grade bounds by clicking the " +
+            "Set Bounds button." + "\nThen, click: Load File";
     @FXML
     ToggleGroup graphToggleGroup;
 
@@ -70,7 +71,7 @@ public class Controller {
     @FXML
     public void initialize() {
         updateNumberOfEntries(grades);
-        display.setText("Welcome to Grade Analytics!\nPlease set the grade bounds by clicking the Set Bounds button.\nThen, click: Load File");
+        display.setText(welcomeText);
         graphToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (getSelectedRadioButton()) {
                 populateDistributionHistogram(grades, highBound, lowBound);
@@ -95,7 +96,10 @@ public class Controller {
     }
 
     /**
-     *fills the average histogram with the grades passed in
+     * Populates the histogram of average grade per grade division.
+     * @param grades - The grades ArrayList.
+     * @param highBound - The highBound.
+     * @param lowBound - The lowBound.
      */
     private void populateAverageHistogram(ArrayList<Float> grades, float highBound, float lowBound) {
         //remove previous data
@@ -138,7 +142,6 @@ public class Controller {
         for (Float g : grades) {
         	float calculatedGrade;
         	//if the lower and upper bounds are the same, every valid grade is 100%
-        	// TODO: check if implementation is correct
         	if(range == 0) {
         		calculatedGrade = 1;
         	}
@@ -236,7 +239,7 @@ public class Controller {
     }
 
     /**
-     * Populates the grade histogram.
+     * Populates the  grade distribution histogram.
      *
      * @param grades    - The arrayList of grades
      * @param highBound - The current highBound
@@ -268,7 +271,6 @@ public class Controller {
         int tenthDivision = 0;
         for (Float g : grades) {
         	//if the lower and upper bounds are the same, every valid grade is 100%
-        	// TODO: check if implementation is correct
         	float calculatedGrade;
         	if(range == 0) {
         		calculatedGrade = 1;
@@ -313,7 +315,6 @@ public class Controller {
         // yAxis Labels must be set manually because of a bug in JavaFx
         yAxis.setCategories(FXCollections.observableArrayList("0-9%", "10-19%", "20-29%", "30-39%", "40-49%", "50-59%", "60-69%", "70-79%", "80-89%", "90-100%"));
         barChart.getData().add(series1);
-
     }
 
     /**
@@ -404,7 +405,7 @@ public class Controller {
                         if (gradeFloat < lowBound || gradeFloat > highBound) {
                         	//if it is the first time getting an out of bounds value,
                         	// clear the display
-                        	if(returnValue == true) {
+                        	if(returnValue) {
                         		display.setText("");
                         	}
                             //if data is out of bounds, don't add it to the temp array
@@ -482,11 +483,11 @@ public class Controller {
             while ((line = br.readLine()) != null) {
                 row++;
                 try {
-                    Float gradeFloat = Float.parseFloat(line.trim());
+                    float gradeFloat = Float.parseFloat(line.trim());
                     if (gradeFloat < lowBound || gradeFloat > highBound) {
                     	//if it is the first time getting an out of bounds value,
                     	// clear the display
-                    	if(returnValue == true) {
+                    	if(returnValue) {
                     		display.setText("");
                     	}
                         //if data is out of bounds, don't add it to the temp array
@@ -559,6 +560,7 @@ public class Controller {
      */
     public void onSetBoundsClicked() {
         boundsSet = true;
+        display.clear();
         String highValueText = inputBoundHigh.getText();
         String lowValueText = inputBoundLow.getText();
         //attempt to set the lower and upper bounds
@@ -568,9 +570,10 @@ public class Controller {
         		display.setText("ERROR: Upper bound value cannot be less than lower bound value\n");
         		display.setStyle("-fx-text-fill: red;");
         		boundsSet = false;
-        		return;
         	}
-            display.setText("Lower Bound Set To: " + lowValueText + "\n" + "Upper Bound Set to: " + highValueText);
+        	if (display.getText().equals(welcomeText))
+        	    display.clear();
+            display.setText(display.getText() + "Lower Bound Set To: " + lowValueText + "\n" + "Upper Bound Set to: " + highValueText);
             display.setStyle("-fx-text-fill: green;");
             logString += "Lower Bound Set To: " + lowValueText + "\n\n";
             logString += "Upper Bound Set To: " + highValueText + "\n\n";
@@ -633,14 +636,13 @@ public class Controller {
         	if(grades.get(i) > highValueFloat) {
         		removedValue = true;
         		grades.remove(g);
-        		display.setText(display.getText() + "\nGrade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n");
+        		display.setText(display.getText() + "Grade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n\n");
                 display.setStyle("-fx-text-fill: red;");
                 sb.append("Grade: ").append(g).append(" was removed. It is greater than upper bound: ").append(highValueFloat).append("\n");
                 i--;
         	}
         }
-        if(removedValue == true) {
-            //update the graph
+        if(removedValue) {
             updateNumberOfEntries(grades);
             calculateMean(grades);
             calculateMedian(grades);
@@ -668,13 +670,13 @@ public class Controller {
         	if(grades.get(i) < lowValueFloat) {
         		removedValue = true;
         		grades.remove(g);
-        		display.setText(display.getText() + "\nGrade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n");
+        		display.setText(display.getText() + "Grade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n\n");
                 display.setStyle("-fx-text-fill: red;");
                 sb.append("Grade: ").append(g).append(" was removed. It is less than lower bound: ").append(lowValueFloat).append("\n");
                 i--;
         	}
         }
-        if(removedValue == true) {
+        if(removedValue) {
             //update the graph
             updateNumberOfEntries(grades);
             calculateMean(grades);
@@ -802,8 +804,8 @@ public class Controller {
         choices.add(dataReport);
         choices.add(activityReport);
 
-        //present the user of either making a GUI of the data in 4 columns,
-        // an error log, or an external report.txt file
+        // Present the user the option of either making a GUI of the data in 4 columns,
+        // an error log, or an external report.txt file.
         ChoiceDialog<String> dialog = new ChoiceDialog<>(errorLog, choices);
 
         dialog.setTitle("Report Dialog");
@@ -833,7 +835,7 @@ public class Controller {
     }
 
     /**
-     * creates an activity report of the actions performed while the program was running
+     * Creates an activity report of the actions performed while the program was running
      * and writes to a report.txt file
      */
     public void createActivityReport() {
@@ -856,7 +858,10 @@ public class Controller {
         }
     }
 
-    //list the entries in 4 columns in the display below the graph
+    /**
+     * Creates the data report - displays grade data in descending order in four columns.
+     * @param grades - The grades ArrayList.
+     */
     public void createDataReport(ArrayList<Float> grades) {
         display.clear();
         int rows = (int) Math.ceil(grades.size() / 4.0);
@@ -873,85 +878,6 @@ public class Controller {
         }
     }
 
-    /*
-     //TODO Implement calculate mean
-    // return type as float rather than void?
-    public float calculateMean(ArrayList<Float> grades)
-    {
-        float sum = 0;
-       for(int i =0 ; i < grades.size(); i++) 
-       {
-           sum = sum + grades.get(i);
-       }
-        return sum/grades.size();
-    }
-
-    //TODO Implement calculate median
-    public float calculateMedian(ArrayList<Float> grades) 
-    {
-    	 Collections.sort(grades);
-        int x = 0;
-        if(grades.size() % 2 == 0) // even array size 
-        {
-            float median1 = (grades.size()/2) - 1;
-            float median2 = grades.size()/2 ;
-            return (grades.get((int) median1) + grades.get((int)median2)) / 2;
-        }
-        else
-        {
-         x = grades.size()/2;
-        return grades.get(x);
-        }  
-    }
-
-    // TODO Implement calculate Mode
-    public float calculateMode(ArrayList<Float> grades)
-    {
-    float maximum = 0; 
-    int maxCounter = 0;
-    int count = 0;
-    
-      for (int i = 0; i < grades.size(); i++) // .size() or .length
-       {
-    	  count = 0;
-    	 
-         for (int j = i; j < grades.size(); j++)
-         {
-        	if (grades.get(j) - grades.get(i) == 0)
-            {
-            	count = count + 1;	 
-            }    
-         }
-      
-         if (count >= maxCounter)
-         {
-            maxCounter = count;
-            maximum = grades.get(i);
-         }
-      }
-      return maximum;
-    }
-
-    // TODO Implement calculate high value
-    public float calculateHighValue(ArrayList<Float> grades) 
-    {
-      Collections.sort(grades);
-      float y =  grades.get(grades.size()- 1);
-      return y;
-
-    }
-
-    // TODO Implement calculate low value
-    public Float calculateLowValue(ArrayList<Float> grades)
-    {
-      Collections.sort(grades);
-      float y =  grades.get(0);
-      return y;
-    } 
-    
-    */
-    
-    
     /**
      * Calculates mean value of grades ArrayList.
      *
@@ -1018,7 +944,6 @@ public class Controller {
         } else {
             this.mode.setText("No Mode");
         }
-
     }
 
     /**
