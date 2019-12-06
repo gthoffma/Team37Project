@@ -58,7 +58,6 @@ public class Controller {
     public boolean boundsSet = false;
     public String errorLogString = "ERRORS:\n\n";
     public Button DeleteSingleButton;
-    public TextField inputDeleteSingleTextField;
     public TextField inputSingleValueTextField;
     public final String welcomeText = "Welcome to Grade Analytics!\nPlease set the grade bounds by clicking the " +
             "Set Bounds button." + "\nThen, click: Load File";
@@ -880,6 +879,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateMean(ArrayList<Float> grades) {
+    	//check to make sure there have been entries made
+    	if(grades.size() < 1) {
+    		meanValue = 0;
+            mean.setText("");
+    		return;
+    	}
         float sum = 0.0f;
         float meanVal;
 
@@ -897,6 +902,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateMedian(ArrayList<Float> grades) {
+    	//make sure the array is bigger than size 0
+    	if(grades.size() < 1) {
+    		medianValue = 0;
+            median.setText("");
+    		return;
+    	}
         float medianVal;
         Collections.sort(grades);
         int middle = grades.size() / 2;
@@ -918,6 +929,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateMode(ArrayList<Float> grades) {
+    	//check to make sure there are entries made
+    	if(grades.size() < 1) {
+    		modeValue = 0;
+            mode.setText("");
+    		return;
+    	}
         float modeVal = 0;
         int maxCount = 0;
         for (int i = 0; i < grades.size(); i++) {
@@ -948,6 +965,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateHighValue(ArrayList<Float> grades) {
+    	//check to make sure there are entries made
+    	if(grades.size() < 1) {
+    		highValue = 0;
+            high.setText("");
+    		return;
+    	}
         float highVal = grades.get(0);
         for (Float g : grades) {
             if (g > highVal) {
@@ -964,6 +987,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateLowValue(ArrayList<Float> grades) {
+    	//make sure the array is bigger than size 0
+    	if(grades.size() < 1) {
+    		lowValue = 0;
+            low.setText("");
+    		return;
+    	}
         float lowVal = grades.get(0);
         for (Float g : grades) {
             if (g < lowVal) {
@@ -1021,12 +1050,13 @@ public class Controller {
             removeValueFromArray(removeFloat);
         } catch (NumberFormatException e) {
         	//if the user did not input a float, tell the user the error
-            display.setText(inputDeleteSingleTextField.getText() + " is not a valid number (float or int)");
+            display.setText(inputSingleValueTextField.getText() + " is not a valid number (float or int)");
             display.setStyle("-fx-text-fill: red ;");
-            errorLogString += inputDeleteSingleTextField.getText() + " is not a valid number (float or int)\n";
+            errorLogString += inputSingleValueTextField.getText() + " is not a valid number (float or int)\n";
         }
         //clear the text field after the input has been handled
-        inputDeleteSingleTextField.clear();
+        inputSingleValueTextField.clear();
+        
     }
 
     /**
