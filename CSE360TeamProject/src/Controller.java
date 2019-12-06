@@ -855,9 +855,7 @@ public class Controller {
         {
          x = grades.size()/2;
         return grades.get(x);
-        }
-       
-       
+        }  
     }
 
     // TODO Implement calculate Mode
@@ -873,11 +871,10 @@ public class Controller {
     	 
          for (int j = i; j < grades.size(); j++)
          {
-        	 if (grades.get(j) - grades.get(i) == 0)
+        	if (grades.get(j) - grades.get(i) == 0)
             {
             	count = count + 1;	 
-            }
-            
+            }    
          }
       
          if (count >= maxCounter)
@@ -904,7 +901,6 @@ public class Controller {
       Collections.sort(grades);
       float y =  grades.get(0);
       return y;
-
     } 
     
     */
