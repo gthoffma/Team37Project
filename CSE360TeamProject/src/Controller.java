@@ -143,7 +143,7 @@ public class Controller {
         		calculatedGrade = 1;
         	}
         	else {
-        		calculatedGrade = g / range;
+        		calculatedGrade = (g-lowBound) / range;
         	}
         	//grades are rounded up if the user has a score ending in .5%
             if (calculatedGrade >= 0 && calculatedGrade < 0.095) {
@@ -274,7 +274,7 @@ public class Controller {
         		calculatedGrade = 1;
         	}
         	else {
-        		calculatedGrade = g / range;
+        		calculatedGrade = (g-lowBound) / range;
         	}
             //grades are rounded up if the user has a score ending in .5%
             if (calculatedGrade >= 0 && calculatedGrade < 0.095) {
@@ -445,6 +445,10 @@ public class Controller {
         	//if the user has not selected to append the data, clear the previous data
             grades.clear();
         }
+        //if all entries were invalid, do not add or calculate anything
+        if(grades.size() == 0) {
+        	return returnValue;
+        }
         //add the temp grades array data to the grades array, update calculations and the graphs
         grades.addAll(tempGrades);
         updateNumberOfEntries(grades);
@@ -517,7 +521,11 @@ public class Controller {
         	//if the user has not selected to append the data, clear the previous data
             grades.clear();
         }
-      //add the temp grades array data to the grades array, update calculations and the graphs
+        //if all entries were invalid, do not add or calculate anything
+        if(grades.size() == 0) {
+        	return returnValue;
+        }
+        //add the temp grades array data to the grades array, update calculations and the graphs
         grades.addAll(tempGrades);
         updateNumberOfEntries(grades);
         calculateMean(grades);
