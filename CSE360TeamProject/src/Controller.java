@@ -626,13 +626,31 @@ public class Controller {
      * @param highValueFloat - The value of the newly entered highBound.
      */
     private void testUpperBoundOnExistingValues(float highValueFloat){
+    	boolean removedValue = false;
         StringBuilder sb = new StringBuilder();
-        for(Float g : grades){
-            if (g > highValueFloat){
-                grades.remove(g);
-                display.setText(display.getText() + "\nGrade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n");
+        for(int i = 0; i < grades.size(); i++) {
+        	float g = grades.get(i);
+        	if(grades.get(i) > highValueFloat) {
+        		removedValue = true;
+        		grades.remove(g);
+        		display.setText(display.getText() + "\nGrade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n");
                 display.setStyle("-fx-text-fill: red;");
                 sb.append("Grade: ").append(g).append(" was removed. It is greater than upper bound: ").append(highValueFloat).append("\n");
+                i--;
+        	}
+        }
+        if(removedValue == true) {
+            //update the graph
+            updateNumberOfEntries(grades);
+            calculateMean(grades);
+            calculateMedian(grades);
+            calculateMode(grades);
+            calculateHighValue(grades);
+            calculateLowValue(grades);
+            if (getSelectedRadioButton()) {
+                populateDistributionHistogram(grades, highBound, lowBound);
+            } else {
+                populateAverageHistogram(grades, highBound, lowBound);
             }
         }
         errorLogString += sb.toString() + "\n";
@@ -643,13 +661,31 @@ public class Controller {
      * @param lowValueFloat - The value of the newly entered lowBound.
      */
     private void testLowerBoundOnExistingValues(float lowValueFloat){
+    	boolean removedValue = false;
         StringBuilder sb = new StringBuilder();
-        for(Float g : grades){
-            if (g < lowValueFloat){
-                grades.remove(g);
-                display.setText(display.getText() + "\nGrade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n");
+        for(int i = 0; i < grades.size(); i++) {
+        	float g = grades.get(i);
+        	if(grades.get(i) < lowValueFloat) {
+        		removedValue = true;
+        		grades.remove(g);
+        		display.setText(display.getText() + "\nGrade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n");
                 display.setStyle("-fx-text-fill: red;");
                 sb.append("Grade: ").append(g).append(" was removed. It is less than lower bound: ").append(lowValueFloat).append("\n");
+                i--;
+        	}
+        }
+        if(removedValue == true) {
+            //update the graph
+            updateNumberOfEntries(grades);
+            calculateMean(grades);
+            calculateMedian(grades);
+            calculateMode(grades);
+            calculateHighValue(grades);
+            calculateLowValue(grades);
+            if (getSelectedRadioButton()) {
+                populateDistributionHistogram(grades, highBound, lowBound);
+            } else {
+                populateAverageHistogram(grades, highBound, lowBound);
             }
         }
         errorLogString += sb.toString() + "\n";
