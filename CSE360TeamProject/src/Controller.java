@@ -577,6 +577,11 @@ public class Controller {
             display.setStyle("-fx-text-fill: green;");
             logString += "Lower Bound Set To: " + lowValueText + "\n\n";
             logString += "Upper Bound Set To: " + highValueText + "\n\n";
+            if (getSelectedRadioButton()) {
+                populateDistributionHistogram(grades, highBound, lowBound);
+            } else {
+                populateAverageHistogram(grades, highBound, lowBound);
+            }
         }
     }
 
@@ -649,11 +654,7 @@ public class Controller {
             calculateMode(grades);
             calculateHighValue(grades);
             calculateLowValue(grades);
-            if (getSelectedRadioButton()) {
-                populateDistributionHistogram(grades, highBound, lowBound);
-            } else {
-                populateAverageHistogram(grades, highBound, lowBound);
-            }
+
         }
         errorLogString += sb.toString() + "\n";
     }
@@ -684,11 +685,6 @@ public class Controller {
             calculateMode(grades);
             calculateHighValue(grades);
             calculateLowValue(grades);
-            if (getSelectedRadioButton()) {
-                populateDistributionHistogram(grades, highBound, lowBound);
-            } else {
-                populateAverageHistogram(grades, highBound, lowBound);
-            }
         }
         errorLogString += sb.toString() + "\n";
     }
