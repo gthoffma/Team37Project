@@ -426,7 +426,6 @@ public class Controller {
                         display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
                                 column + " is " + s + ", which is not a float or int");
                         display.setStyle("-fx-text-fill: red;");
-                        //is there a reason append is called several times here instead of +?
                         sb.append("ERROR: row: ").append(row).append(" column: ").append(column).append(" is ").append(s).append(", which is not a float or int\n");
                         returnValue = false;
                     }
@@ -446,7 +445,7 @@ public class Controller {
             grades.clear();
         }
         //if all entries were invalid, do not add or calculate anything
-        if(grades.size() == 0) {
+        if(tempGrades.size() == 0) {
         	return returnValue;
         }
         //add the temp grades array data to the grades array, update calculations and the graphs
@@ -503,6 +502,9 @@ public class Controller {
                 } catch (NumberFormatException e) {
                 	//if the value could not be read as a float, do not add values from the file into the 
                 	// grade array, tell the user of the errors, then set the return value to false
+                    if (returnValue) {
+                        display.setText("The following error(s) have occurred when reading input:");
+                    }
                     display.setText(display.getText() + "\n\tERROR: row: " + row + " is " + line.trim() + ", which is not a float or int");
                     display.setStyle("-fx-text-fill: red;");
                     sb.append("ERROR: row: ").append(row).append(" is ").append(line.trim()).append(", which is not a float or int\n");
@@ -522,7 +524,7 @@ public class Controller {
             grades.clear();
         }
         //if all entries were invalid, do not add or calculate anything
-        if(grades.size() == 0) {
+        if(tempGrades.size() == 0) {
         	return returnValue;
         }
         //add the temp grades array data to the grades array, update calculations and the graphs
