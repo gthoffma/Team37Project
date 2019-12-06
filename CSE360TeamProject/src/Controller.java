@@ -711,6 +711,7 @@ public class Controller {
             } else {
             	//if the input is in bounds, tell the user and update the calculations
                 display.setText("Single Value: " + tempGrade + " was successfully added to the grades list.");
+                display.setStyle("-fx-text-fill: green ;");
                 grades.add(tempGrade);
                 updateNumberOfEntries(grades);
                 calculateMean(grades);
@@ -718,7 +719,11 @@ public class Controller {
                 calculateMode(grades);
                 calculateHighValue(grades);
                 calculateLowValue(grades);
-                populateDistributionHistogram(grades, highBound, lowBound);
+                if (getSelectedRadioButton()) {
+                    populateDistributionHistogram(grades, highBound, lowBound);
+                } else {
+                    populateAverageHistogram(grades, highBound, lowBound);
+                }
                 logString += "Single Value: " + tempGrade + " successfully added to the grades list.\n\n";
             }
         } catch (NumberFormatException e) {
@@ -1019,7 +1024,11 @@ public class Controller {
             if (result.get() == ButtonType.OK) {
                 // ... user chose OK, delete data and reset the calculated values
                 grades.clear();
-                populateDistributionHistogram(grades, highBound, lowBound);
+                if (getSelectedRadioButton()) {
+                    populateDistributionHistogram(grades, highBound, lowBound);
+                } else {
+                    populateAverageHistogram(grades, highBound, lowBound);
+                }
                 updateNumberOfEntries(grades);
                 meanValue = 0;
                 mean.setText("");
