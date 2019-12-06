@@ -469,6 +469,12 @@ public class Controller {
         String highValueText = inputBoundHigh.getText();
         String lowValueText = inputBoundLow.getText();
         if (setUpperBound(highValueText) && setLowerBound(lowValueText)) {
+        	if(lowBound > highBound) {
+        		display.setText("ERROR: Upper bound value cannot be less than lower bound value\n");
+        		display.setStyle("-fx-text-fill: red;");
+        		boundsSet = false;
+        		return;
+        	}
             display.setText("Lower Bound Set To: " + lowValueText + "\n" + "Upper Bound Set to: " + highValueText);
             display.setStyle("-fx-text-fill: green;");
             logString += "Lower Bound Set To: " + lowValueText + "\n\n";
