@@ -402,10 +402,16 @@ public class Controller {
                     try {
                         float gradeFloat = Float.parseFloat(s);
                         if (gradeFloat < lowBound || gradeFloat > highBound) {
+                        	//if it is the first time getting an out of bounds value,
+                        	// clear the display
+                        	if(returnValue == true) {
+                        		display.setText("");
+                        	}
                             //if data is out of bounds, don't add it to the temp array
-                            display.setText(display.getText() + "\n\tERROR: row: " + row + " column: " +
-                                    column + " is " + s + ", which is out of bounds.");
+                            display.setText(display.getText() + "\tERROR: row: " + row + " column: " +
+                                    column + " is " + s + ", which is out of bounds.\n");
                             display.setStyle("-fx-text-fill: red;");
+                            returnValue = false;
                             sb.append("ERROR: row: ").append(row).append(" column: ").append(column).append(" is ").append(s).append(", which is out of bounds\n");
                         } else {
                         	//if the data is in the bounds, add it to the temp array
@@ -475,10 +481,16 @@ public class Controller {
                 try {
                     Float gradeFloat = Float.parseFloat(line.trim());
                     if (gradeFloat < lowBound || gradeFloat > highBound) {
+                    	//if it is the first time getting an out of bounds value,
+                    	// clear the display
+                    	if(returnValue == true) {
+                    		display.setText("");
+                    	}
                         //if data is out of bounds, don't add it to the temp array
-                        display.setText(display.getText() + "\n\tERROR: row: " + row + " is " + line.trim() +
-                        		", which is out of bounds.");
+                        display.setText(display.getText() + "\tERROR: row: " + row + " is " + line.trim() +
+                        		", which is out of bounds.\n");
                         display.setStyle("-fx-text-fill: red;");
+                        returnValue = false;
                         sb.append("ERROR: row: ").append(row).append(" is ").append(line.trim()).append(", which is out of bounds\n");
                     } else {
                     	//if the data is in the bounds, add it to the temp array
