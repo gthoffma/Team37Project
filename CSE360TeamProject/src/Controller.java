@@ -827,6 +827,89 @@ public class Controller {
         }
     }
 
+    /*
+     //TODO Implement calculate mean
+    // return type as float rather than void?
+    public float calculateMean(ArrayList<Float> grades)
+    {
+        float sum = 0;
+       for(int i =0 ; i < grades.size(); i++) 
+       {
+           sum = sum + grades.get(i);
+       }
+        return sum/grades.size();
+    }
+
+    //TODO Implement calculate median
+    public float calculateMedian(ArrayList<Float> grades) 
+    {
+    	 Collections.sort(grades);
+        int x = 0;
+        if(grades.size() % 2 == 0) // even array size 
+        {
+            float median1 = (grades.size()/2) - 1;
+            float median2 = grades.size()/2 ;
+            return (grades.get((int) median1) + grades.get((int)median2)) / 2;
+        }
+        else
+        {
+         x = grades.size()/2;
+        return grades.get(x);
+        }
+       
+       
+    }
+
+    // TODO Implement calculate Mode
+    public float calculateMode(ArrayList<Float> grades)
+    {
+    float maximum = 0; 
+    int maxCounter = 0;
+    int count = 0;
+    
+      for (int i = 0; i < grades.size(); i++) // .size() or .length
+       {
+    	  count = 0;
+    	 
+         for (int j = i; j < grades.size(); j++)
+         {
+        	 if (grades.get(j) - grades.get(i) == 0)
+            {
+            	count = count + 1;	 
+            }
+            
+         }
+      
+         if (count >= maxCounter)
+         {
+            maxCounter = count;
+            maximum = grades.get(i);
+         }
+      }
+      return maximum;
+    }
+
+    // TODO Implement calculate high value
+    public float calculateHighValue(ArrayList<Float> grades) 
+    {
+      Collections.sort(grades);
+      float y =  grades.get(grades.size()- 1);
+      return y;
+
+    }
+
+    // TODO Implement calculate low value
+    public Float calculateLowValue(ArrayList<Float> grades)
+    {
+      Collections.sort(grades);
+      float y =  grades.get(0);
+      return y;
+
+    } 
+    
+    */
+    
+    
     /**
      * Calculates mean value of grades ArrayList.
      *
