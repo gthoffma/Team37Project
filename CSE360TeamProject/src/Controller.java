@@ -65,7 +65,7 @@ public class Controller {
     ToggleGroup graphToggleGroup;
 
     /**
-     *initialize the graph with an empty graph and welcome user
+     * initialize the graph with an empty graph and welcome user
      */
     @FXML
     public void initialize() {
@@ -82,8 +82,8 @@ public class Controller {
 
 
     /**
-     *returns true if the user selects graph by distribution and false
-     *if the user selects graph by average
+     * returns true if the user selects graph by distribution and false
+     * if the user selects graph by average
      */
     private boolean getSelectedRadioButton() {
         boolean returnValue = true;
@@ -96,9 +96,10 @@ public class Controller {
 
     /**
      * Populates the histogram of average grade per grade division.
-     * @param grades - The grades ArrayList.
+     *
+     * @param grades    - The grades ArrayList.
      * @param highBound - The highBound.
-     * @param lowBound - The lowBound.
+     * @param lowBound  - The lowBound.
      */
     private void populateAverageHistogram(ArrayList<Float> grades, float highBound, float lowBound) {
         //remove previous data
@@ -139,15 +140,14 @@ public class Controller {
         //loop through all the entries and input the entry into the 
         // appropriate division
         for (Float g : grades) {
-        	float calculatedGrade;
-        	//if the lower and upper bounds are the same, every valid grade is 100%
-        	if(range == 0) {
-        		calculatedGrade = 1;
-        	}
-        	else {
-        		calculatedGrade = (g-lowBound) / range;
-        	}
-        	//grades are rounded up if the user has a score ending in .5%
+            float calculatedGrade;
+            //if the lower and upper bounds are the same, every valid grade is 100%
+            if (range == 0) {
+                calculatedGrade = 1;
+            } else {
+                calculatedGrade = (g - lowBound) / range;
+            }
+            //grades are rounded up if the user has a score ending in .5%
             if (calculatedGrade >= 0 && calculatedGrade < 0.095) {
                 firstDivision++;
                 firstDivisionSum += (calculatedGrade * 100);
@@ -269,14 +269,13 @@ public class Controller {
         int ninthDivision = 0;
         int tenthDivision = 0;
         for (Float g : grades) {
-        	//if the lower and upper bounds are the same, every valid grade is 100%
-        	float calculatedGrade;
-        	if(range == 0) {
-        		calculatedGrade = 1;
-        	}
-        	else {
-        		calculatedGrade = (g-lowBound) / range;
-        	}
+            //if the lower and upper bounds are the same, every valid grade is 100%
+            float calculatedGrade;
+            if (range == 0) {
+                calculatedGrade = 1;
+            } else {
+                calculatedGrade = (g - lowBound) / range;
+            }
             //grades are rounded up if the user has a score ending in .5%
             if (calculatedGrade >= 0 && calculatedGrade < 0.095) {
                 firstDivision++;
@@ -334,17 +333,12 @@ public class Controller {
         Stage stage = (Stage) GridPane.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-        	//check the fileName extension and load the entries appropriately
+            //check the fileName extension and load the entries appropriately
             String extension;
             String fileName = file.getName();
             int i = fileName.lastIndexOf('.');
             if (i > 0) {
                 extension = fileName.substring(i + 1);
-                //NOTE: why is the errorLogString updated here?
-                //if the data was loaded successfully, tell the user
-                // since the user has selected to load the data instead of append, 
-                // the read files methods are passed in false to delete the data before adding data from
-                // the file
                 if (extension.equals("csv")) {
                     if (readCSVFile(file, false)) {
                         errorLogString = "ERRORS:\n";
@@ -402,11 +396,11 @@ public class Controller {
                     try {
                         float gradeFloat = Float.parseFloat(s);
                         if (gradeFloat < lowBound || gradeFloat > highBound) {
-                        	//if it is the first time getting an out of bounds value,
-                        	// clear the display
-                        	if(returnValue) {
-                        		display.setText("");
-                        	}
+                            //if it is the first time getting an out of bounds value,
+                            // clear the display
+                            if (returnValue) {
+                                display.setText("");
+                            }
                             //if data is out of bounds, don't add it to the temp array
                             display.setText(display.getText() + "\tERROR: row: " + row + " column: " +
                                     column + " is " + s + ", which is out of bounds.\n");
@@ -414,12 +408,12 @@ public class Controller {
                             returnValue = false;
                             sb.append("ERROR: row: ").append(row).append(" column: ").append(column).append(" is ").append(s).append(", which is out of bounds\n");
                         } else {
-                        	//if the data is in the bounds, add it to the temp array
+                            //if the data is in the bounds, add it to the temp array
                             tempGrades.add(gradeFloat);
                         }
                     } catch (NumberFormatException e) {
-                    	//if the value could not be read as a float, do not add values from the file into the 
-                    	// grade array, tell the user of the errors, then set the return value to false
+                        //if the value could not be read as a float, do not add values from the file into the
+                        // grade array, tell the user of the errors, then set the return value to false
                         if (returnValue) {
                             display.setText("The following error(s) have occurred when reading input:");
                         }
@@ -433,7 +427,7 @@ public class Controller {
                 }
             }
         } catch (IOException e) {
-        	//if the file could not be read, tell the user
+            //if the file could not be read, tell the user
             display.setText("ERROR: Unable to read the file provided. " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
             sb.append("ERROR: Unable to read the file provided. ").append(e.getMessage()).append("\n");
@@ -441,12 +435,12 @@ public class Controller {
         }
         errorLogString += sb.toString() + "\n";
         if (!append) {
-        	//if the user has not selected to append the data, clear the previous data
+            //if the user has not selected to append the data, clear the previous data
             grades.clear();
         }
         //if all entries were invalid, do not add or calculate anything
-        if(tempGrades.size() == 0) {
-        	return returnValue;
+        if (tempGrades.size() == 0) {
+            return returnValue;
         }
         //add the temp grades array data to the grades array, update calculations and the graphs
         grades.addAll(tempGrades);
@@ -484,24 +478,22 @@ public class Controller {
                 try {
                     float gradeFloat = Float.parseFloat(line.trim());
                     if (gradeFloat < lowBound || gradeFloat > highBound) {
-                    	//if it is the first time getting an out of bounds value,
-                    	// clear the display
-                    	if(returnValue) {
-                    		display.setText("");
-                    	}
+                        //if it is the first time getting an out of bounds value,
+                        // clear the display
+                        if (returnValue) {
+                            display.setText("");
+                        }
                         //if data is out of bounds, don't add it to the temp array
                         display.setText(display.getText() + "\tERROR: row: " + row + " is " + line.trim() +
-                        		", which is out of bounds.\n");
+                                ", which is out of bounds.\n");
                         display.setStyle("-fx-text-fill: red;");
                         returnValue = false;
                         sb.append("ERROR: row: ").append(row).append(" is ").append(line.trim()).append(", which is out of bounds\n");
                     } else {
-                    	//if the data is in the bounds, add it to the temp array
+                        //if the data is in the bounds, add it to the temp array
                         tempGrades.add(gradeFloat);
                     }
                 } catch (NumberFormatException e) {
-                	//if the value could not be read as a float, do not add values from the file into the 
-                	// grade array, tell the user of the errors, then set the return value to false
                     if (returnValue) {
                         display.setText("The following error(s) have occurred when reading input:");
                     }
@@ -512,7 +504,7 @@ public class Controller {
                 }
             }
         } catch (IOException e) {
-        	//if the file could not be read, tell the user
+            //if the file could not be read, tell the user
             display.setText("ERROR: Unable to read the file provided. " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
             sb.append("ERROR: Unable to read the file provided. ").append(e.getMessage()).append("\n");
@@ -520,12 +512,12 @@ public class Controller {
         }
         errorLogString += sb.toString() + "\n";
         if (!append) {
-        	//if the user has not selected to append the data, clear the previous data
+            //if the user has not selected to append the data, clear the previous data
             grades.clear();
         }
         //if all entries were invalid, do not add or calculate anything
-        if(tempGrades.size() == 0) {
-        	return returnValue;
+        if (tempGrades.size() == 0) {
+            return returnValue;
         }
         //add the temp grades array data to the grades array, update calculations and the graphs
         grades.addAll(tempGrades);
@@ -564,14 +556,14 @@ public class Controller {
         String lowValueText = inputBoundLow.getText();
         //attempt to set the lower and upper bounds
         if (setUpperBound(highValueText) && setLowerBound(lowValueText)) {
-        	//if the lower bound is greater than the upperbound, tell the user
-        	if(lowBound > highBound) {
-        		display.setText("ERROR: Upper bound value cannot be less than lower bound value\n");
-        		display.setStyle("-fx-text-fill: red;");
-        		boundsSet = false;
-        	}
-        	if (display.getText().equals(welcomeText))
-        	    display.clear();
+            //if the lower bound is greater than the upperbound, tell the user
+            if (lowBound > highBound) {
+                display.setText("ERROR: Upper bound value cannot be less than lower bound value\n");
+                display.setStyle("-fx-text-fill: red;");
+                boundsSet = false;
+            }
+            if (display.getText().equals(welcomeText))
+                display.clear();
             display.setText(display.getText() + "Lower Bound Set To: " + lowValueText + "\n" + "Upper Bound Set to: " + highValueText);
             display.setStyle("-fx-text-fill: green;");
             logString += "Lower Bound Set To: " + lowValueText + "\n\n";
@@ -630,23 +622,24 @@ public class Controller {
 
     /**
      * Tests existing grades ArrayList for values greater than the newly-entered highBound. Removes them and logs error message.
+     *
      * @param highValueFloat - The value of the newly entered highBound.
      */
-    private void testUpperBoundOnExistingValues(float highValueFloat){
-    	boolean removedValue = false;
+    private void testUpperBoundOnExistingValues(float highValueFloat) {
+        boolean removedValue = false;
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < grades.size(); i++) {
-        	float g = grades.get(i);
-        	if(grades.get(i) > highValueFloat) {
-        		removedValue = true;
-        		grades.remove(g);
-        		display.setText(display.getText() + "Grade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n\n");
+        for (int i = 0; i < grades.size(); i++) {
+            float g = grades.get(i);
+            if (grades.get(i) > highValueFloat) {
+                removedValue = true;
+                grades.remove(g);
+                display.setText(display.getText() + "Grade: " + g + " was removed. It is greater than upper bound: " + highValueFloat + "\n\n");
                 display.setStyle("-fx-text-fill: red;");
                 sb.append("Grade: ").append(g).append(" was removed. It is greater than upper bound: ").append(highValueFloat).append("\n");
                 i--;
-        	}
+            }
         }
-        if(removedValue) {
+        if (removedValue) {
             updateNumberOfEntries(grades);
             calculateMean(grades);
             calculateMedian(grades);
@@ -660,23 +653,24 @@ public class Controller {
 
     /**
      * Tests existing grades ArrayList for values less than the newly-entered lowBound. Removes them and logs error message.
+     *
      * @param lowValueFloat - The value of the newly entered lowBound.
      */
-    private void testLowerBoundOnExistingValues(float lowValueFloat){
-    	boolean removedValue = false;
+    private void testLowerBoundOnExistingValues(float lowValueFloat) {
+        boolean removedValue = false;
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < grades.size(); i++) {
-        	float g = grades.get(i);
-        	if(grades.get(i) < lowValueFloat) {
-        		removedValue = true;
-        		grades.remove(g);
-        		display.setText(display.getText() + "Grade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n\n");
+        for (int i = 0; i < grades.size(); i++) {
+            float g = grades.get(i);
+            if (grades.get(i) < lowValueFloat) {
+                removedValue = true;
+                grades.remove(g);
+                display.setText(display.getText() + "Grade: " + g + " was removed. It is less than lower bound: " + lowValueFloat + "\n\n");
                 display.setStyle("-fx-text-fill: red;");
                 sb.append("Grade: ").append(g).append(" was removed. It is less than lower bound: ").append(lowValueFloat).append("\n");
                 i--;
-        	}
+            }
         }
-        if(removedValue) {
+        if (removedValue) {
             //update the graph
             updateNumberOfEntries(grades);
             calculateMean(grades);
@@ -692,7 +686,7 @@ public class Controller {
      * Called when user clicks the Add Single Value button.
      */
     public void onManualEntryClicked() {
-    	//don't let the user add values if the bounds have not been set
+        //don't let the user add values if the bounds have not been set
         if (!boundsSet) {
             display.setText("ERROR: Please set lower and upper bounds for values before entering a value \n (click the Set Bounds button)");
             display.setStyle("-fx-text-fill: red ;");
@@ -709,7 +703,7 @@ public class Controller {
                 display.setStyle("-fx-text-fill: red ;");
                 errorLogString += "ERROR: " + tempGrade + " is not within set bounds\n\n";
             } else {
-            	//if the input is in bounds, tell the user and update the calculations
+                //if the input is in bounds, tell the user and update the calculations
                 display.setText("Single Value: " + tempGrade + " was successfully added to the grades list.");
                 display.setStyle("-fx-text-fill: green ;");
                 grades.add(tempGrade);
@@ -727,7 +721,7 @@ public class Controller {
                 logString += "Single Value: " + tempGrade + " successfully added to the grades list.\n\n";
             }
         } catch (NumberFormatException e) {
-        	//if the input could not be recognized as a float, tell the user
+            //if the input could not be recognized as a float, tell the user
             display.setText("ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)");
             display.setStyle("-fx-text-fill: red ;");
             errorLogString += "ERROR: " + inputSingleValueTextField.getText() + " is not recognized as a valid number (float or int)\n\n";
@@ -751,15 +745,15 @@ public class Controller {
         Stage stage = (Stage) GridPane.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-        	//get the extension of the file and call the appropriate method
+            //get the extension of the file and call the appropriate method
             String extension;
             String fileName = file.getName();
             int i = fileName.lastIndexOf('.');
             if (i > 0) {
-                //if the data was loaded successfully, tell the user.
-                //Since the user has selected to load the data instead of append, 
-                // the read files methods are passed in false to delete the data before adding data from
-                // the file
+                // if the data was loaded successfully, tell the user.
+                // Since the user has selected to append the data,
+                // the read files methods are passed in false to not delete the data
+                // before adding data from the file
                 extension = fileName.substring(i + 1);
                 if (extension.equals("csv")) {
                     if (readCSVFile(file, true)) {
@@ -790,9 +784,9 @@ public class Controller {
 
     /**
      * Creates the 3 Reports Needed:
-     *   1. Display Data in the GUI in 4 columns in descending order
-     *   2. Error Log
-     *   3. External report.txt file
+     * 1. Display Data in the GUI in 4 columns in descending order
+     * 2. Error Log
+     * 3. External report.txt file
      */
     public void onCreateReportsClicked() {
         ArrayList<String> choices = new ArrayList<>();
@@ -850,8 +844,8 @@ public class Controller {
             display.setStyle("-fx-text-fill: green;");
             logString += "Activity Report: " + reportFile + " Successfully Created.\n\n";
         } catch (Exception e) {
-        	//if the file could not be written to or the bufferedWriter could not start,
-        	// tell the user the error message
+            //if the file could not be written to or the bufferedWriter could not start,
+            // tell the user the error message
             display.setText("ERROR: There was an error creating the Activity Report: " + e.getMessage());
             display.setStyle("-fx-text-fill: red;");
             errorLogString += "ERROR: There was an error creating the Activity Report: " + e.getMessage() + "\n\n";
@@ -860,6 +854,7 @@ public class Controller {
 
     /**
      * Creates the data report - displays grade data in descending order in four columns.
+     *
      * @param grades - The grades ArrayList.
      */
     public void createDataReport(ArrayList<Float> grades) {
@@ -884,12 +879,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateMean(ArrayList<Float> grades) {
-    	//check to make sure there have been entries made
-    	if(grades.size() < 1) {
-    		meanValue = 0;
+        //check to make sure there have been entries made
+        if (grades.size() < 1) {
+            meanValue = 0;
             mean.setText("");
-    		return;
-    	}
+            return;
+        }
         float sum = 0.0f;
         float meanVal;
 
@@ -907,12 +902,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateMedian(ArrayList<Float> grades) {
-    	//make sure the array is bigger than size 0
-    	if(grades.size() < 1) {
-    		medianValue = 0;
+        //make sure the array is bigger than size 0
+        if (grades.size() < 1) {
+            medianValue = 0;
             median.setText("");
-    		return;
-    	}
+            return;
+        }
         float medianVal;
         Collections.sort(grades);
         int middle = grades.size() / 2;
@@ -928,18 +923,18 @@ public class Controller {
 
     /**
      * Calculates mode value of grades ArrayList.
-     * If every entry is input at most once, 
+     * If every entry is input at most once,
      * there is no mode
      *
      * @param grades - The grades ArrayList.
      */
     public void calculateMode(ArrayList<Float> grades) {
-    	//check to make sure there are entries made
-    	if(grades.size() < 1) {
-    		modeValue = 0;
+        //check to make sure there are entries made
+        if (grades.size() < 1) {
+            modeValue = 0;
             mode.setText("");
-    		return;
-    	}
+            return;
+        }
         float modeVal = 0;
         int maxCount = 0;
         for (int i = 0; i < grades.size(); i++) {
@@ -970,12 +965,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateHighValue(ArrayList<Float> grades) {
-    	//check to make sure there are entries made
-    	if(grades.size() < 1) {
-    		highValue = 0;
+        //check to make sure there are entries made
+        if (grades.size() < 1) {
+            highValue = 0;
             high.setText("");
-    		return;
-    	}
+            return;
+        }
         float highVal = grades.get(0);
         for (Float g : grades) {
             if (g > highVal) {
@@ -992,12 +987,12 @@ public class Controller {
      * @param grades - The grades ArrayList.
      */
     public void calculateLowValue(ArrayList<Float> grades) {
-    	//make sure the array is bigger than size 0
-    	if(grades.size() < 1) {
-    		lowValue = 0;
+        //make sure the array is bigger than size 0
+        if (grades.size() < 1) {
+            lowValue = 0;
             low.setText("");
-    		return;
-    	}
+            return;
+        }
         float lowVal = grades.get(0);
         for (Float g : grades) {
             if (g < lowVal) {
@@ -1010,8 +1005,8 @@ public class Controller {
 
     /**
      * Prompts the user to confirm deletion of all grade data
-     *  and deletes the data and calculations if the user selects
-     *  "OK"
+     * and deletes the data and calculations if the user selects
+     * "OK"
      */
     public void onDeleteDataClicked() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -1058,25 +1053,26 @@ public class Controller {
             //attempt to remove the float from the array
             removeValueFromArray(removeFloat);
         } catch (NumberFormatException e) {
-        	//if the user did not input a float, tell the user the error
+            //if the user did not input a float, tell the user the error
             display.setText(inputSingleValueTextField.getText() + " is not a valid number (float or int)");
             display.setStyle("-fx-text-fill: red ;");
             errorLogString += inputSingleValueTextField.getText() + " is not a valid number (float or int)\n";
         }
         //clear the text field after the input has been handled
         inputSingleValueTextField.clear();
-        
+
     }
 
     /**
      * Removes the value from the grades ArrayList, logs an error if the value is not in the grades ArrayList.
+     *
      * @param value - The value to remove.
      */
     public void removeValueFromArray(float value) {
-    	//attempt to remove the passed value from the grades list
+        //attempt to remove the passed value from the grades list
         boolean inArray = grades.remove(value);
         if (inArray) {
-        	//if the value was removed, tell the user and update the calculated variables
+            //if the value was removed, tell the user and update the calculated variables
             display.setText("Single Value: " + value + " was successfully removed from the grades list");
             logString += "Single Value: " + value + " was successfully removed from the grades list.\n\n";
             display.setStyle("-fx-text-fill: green ;");
@@ -1088,7 +1084,7 @@ public class Controller {
             calculateLowValue(grades);
             populateDistributionHistogram(grades, highBound, lowBound);
         } else {
-        	//if the value could not be removed, tell the user
+            //if the value could not be removed, tell the user
             display.setText("The value " + value + " was not found in the grades list");
             display.setStyle("-fx-text-fill: red ;");
             errorLogString += "The value " + value + " was not found in the grades list\n\n";
